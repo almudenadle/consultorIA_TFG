@@ -1,0 +1,43 @@
+<div class="consulting-index-container">
+  @if (formIndexEntries.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-inbox"></i>
+      <p-message severity="warn" text="No hay cuestionarios disponibles"></p-message>
+    </div>
+  } @else {
+    <div class="index-header">
+      <i class="pi pi-list"></i>
+      <h3 class="index-title">Índice</h3>
+    </div>
+    
+    <div class="areas-list">
+      @for (area of groupedAreas; track area.areaName) {
+        <div class="area-group">
+          <!-- Encabezado del área -->
+          <div class="area-header">
+            <p-tag
+              [value]="area.displayName"
+              [style]="{'background': getRgbaColor(area.areaName), 'color': getHexColor(area.areaName)}"
+            />
+          </div>
+          
+          <!-- Lista de cuestionarios del área -->
+          <div class="forms-list">
+            @for (entry of area.forms; track entry.formNumber) {
+              <div
+                class="form-entry"
+                [class.active]="entry.isActive"
+                [class.completed]="entry.isCompleted"
+                (click)="onFormClick(entry.formNumber)"
+              >
+                <div class="form-content">
+                  <span class="form-title">Cuestionario {{ entry.formNumber }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

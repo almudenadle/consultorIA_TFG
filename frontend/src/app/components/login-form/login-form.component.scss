@@ -1,0 +1,419 @@
+:host {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-card {
+    background: var(--p-surface-0);
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.1),
+        0 0 0 1px var(--p-surface-200);
+    border: none;
+    backdrop-filter: blur(20px) saturate(180%);
+    transition: all 0.3s ease;
+    
+    &:hover {
+        box-shadow: 
+            0 25px 70px rgba(0, 0, 0, 0.15),
+            0 0 0 1px var(--p-primary-200);
+        transform: translateY(-2px);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        background: var(--p-surface-800);
+        box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px var(--p-surface-700);
+        
+        &:hover {
+            box-shadow: 
+                0 25px 70px rgba(0, 0, 0, 0.6),
+                0 0 0 1px var(--p-primary-500);
+        }
+    }
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+
+    ::ng-deep .back-button {
+        position: absolute;
+        left: 0;
+        top: 0;
+        
+        .p-button {
+            color: var(--p-primary-500);
+            font-size: 1.25rem;
+            width: 40px;
+            height: 40px;
+            transition: all 0.3s ease;
+
+            &:enabled:hover {
+                background: var(--p-primary-50);
+                transform: translateX(-2px);
+            }
+
+            &:enabled:active {
+                transform: translateX(-4px);
+                background: var(--p-primary-100);
+            }
+
+            @media (prefers-color-scheme: dark) {
+                color: var(--p-primary-300);
+
+                &:enabled:hover {
+                    background: var(--p-surface-700);
+                }
+
+                &:enabled:active {
+                    background: var(--p-surface-600);
+                }
+            }
+        }
+    }
+
+    &::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--p-sec2-500), var(--p-primary-500));
+        margin: 1rem auto 0;
+        border-radius: 2px;
+    }
+
+    h2 {
+        color: var(--p-primary-500);
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        font-size: 1.8rem;
+        letter-spacing: -0.5px;
+        font-family: var(--font-family);
+        
+        @media (prefers-color-scheme: dark) {
+            color: var(--p-primary-300);
+            text-shadow: 0 2px 10px rgba(170, 169, 214, 0.3);
+        }
+    }
+
+    p {
+        color: var(--p-text-color);
+        font-size: 1rem;
+        font-weight: 500;
+        opacity: 0.9;
+        line-height: 1.6;
+        font-family: var(--font-family);
+        
+        @media (prefers-color-scheme: dark) {
+            opacity: 0.8;
+        }
+    }
+}
+
+.form-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    width: 100%;
+    
+    // Animación de aparición
+    animation: slideIn 0.4s ease-out backwards;
+    
+    &:nth-child(1) { animation-delay: 0.1s; }
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.3s; }
+    &:nth-child(4) { animation-delay: 0.4s; }
+    
+    // Asegurar que el float label container ocupe todo el ancho
+    .p-floatlabel {
+        width: 100%;
+        display: block;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.error-text {
+    color: var(--p-red-500);
+    font-size: 0.85rem;
+    font-family: var(--font-family);
+    font-weight: 500;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    animation: shake 0.3s ease;
+    
+    @media (prefers-color-scheme: dark) {
+        color: var(--p-red-400);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+// PrimeNG component overrides
+.login-card ::ng-deep {
+    .p-inputtext {
+        width: 100% !important;
+        border: 2px solid var(--p-surface-300);
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+        font-family: var(--font-family);
+        transition: all 0.3s ease;
+        background: var(--p-surface-0);
+        box-sizing: border-box;
+        color: var(--p-text-color);
+        
+        &::placeholder {
+            color: var(--p-text-muted-color);
+            opacity: 0.7;
+        }
+        
+        &:enabled:focus {
+            border-color: var(--p-primary-500);
+            box-shadow: 0 0 0 3px var(--p-primary-50);
+            background: var(--p-surface-0);
+        }
+        
+        &:enabled:hover {
+            border-color: var(--p-primary-400);
+            background: var(--p-surface-0);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            background: var(--p-surface-900);
+            border-color: var(--p-surface-600);
+            
+            &::placeholder {
+                color: var(--p-text-muted-color);
+                opacity: 0.6;
+            }
+            
+            &:enabled:focus {
+                background: var(--p-surface-800);
+                border-color: var(--p-primary-500);
+                box-shadow: 0 0 0 3px rgba(170, 169, 214, 0.2);
+            }
+            
+            &:enabled:hover {
+                background: var(--p-surface-800);
+                border-color: var(--p-primary-400);
+            }
+        }
+    }
+
+    .p-password {
+        width: 100%;
+        display: block;
+        
+        .p-password-input,
+        input {
+            width: 100% !important;
+            border: 2px solid var(--p-surface-300);
+            padding: 0.875rem 1rem;
+            padding-right: 3rem;
+            font-size: 1rem;
+            font-family: var(--font-family);
+            transition: all 0.3s ease;
+            background: var(--p-surface-0);
+            box-sizing: border-box;
+            color: var(--p-text-color);
+            
+            &::placeholder {
+                color: var(--p-text-muted-color);
+                opacity: 0.7;
+            }
+            
+            &:enabled:focus {
+                border-color: var(--p-primary-500);
+                box-shadow: 0 0 0 3px var(--p-primary-50);
+                background: var(--p-surface-0);
+            }
+            
+            &:enabled:hover {
+                border-color: var(--p-primary-400);
+                background: var(--p-surface-0);
+            }
+            
+            @media (prefers-color-scheme: dark) {
+                background: var(--p-surface-900);
+                border-color: var(--p-surface-600);
+                
+                &::placeholder {
+                    color: var(--p-text-muted-color);
+                    opacity: 0.6;
+                }
+                
+                &:enabled:focus {
+                    background: var(--p-surface-800);
+                    border-color: var(--p-primary-500);
+                    box-shadow: 0 0 0 3px rgba(170, 169, 214, 0.2);
+                }
+                
+                &:enabled:hover {
+                    background: var(--p-surface-800);
+                    border-color: var(--p-primary-400);
+                }
+            }
+        }
+        
+        .p-icon,
+        button {
+            color: var(--p-text-muted-color);
+            
+            @media (prefers-color-scheme: dark) {
+                color: var(--p-text-muted-color);
+            }
+        }
+    }
+
+    .custom-btn {
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+        font-weight: 500;
+        font-family: var(--font-family);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: var(--p-primary-500) !important;
+        border-color: var(--p-primary-500) !important;
+        color: #ffffff !important;
+        
+        .p-button-label {
+            color: #ffffff !important;
+        }
+        
+        .p-button-icon {
+            color: #ffffff !important;
+        }
+        
+        &:enabled:hover:not(:disabled) {
+            background: var(--p-primary-600) !important;
+            border-color: var(--p-primary-600) !important;
+            color: #ffffff !important;
+            
+            .p-button-label {
+                color: #ffffff !important;
+            }
+            
+            .p-button-icon {
+                color: #ffffff !important;
+            }
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            background: var(--p-primary-500) !important;
+            border-color: var(--p-primary-500) !important;
+            color: #ffffff !important;
+            
+            .p-button-label {
+                color: #ffffff !important;
+            }
+            
+            .p-button-icon {
+                color: #ffffff !important;
+            }
+            
+            &:enabled:hover:not(:disabled) {
+                background: var(--p-primary-600) !important;
+                border-color: var(--p-primary-600) !important;
+                color: #ffffff !important;
+                
+                .p-button-label {
+                    color: #ffffff !important;
+                }
+                
+                .p-button-icon {
+                    color: #ffffff !important;
+                }
+            }
+        }
+    }
+    
+    // Floatlabel styles for PrimeNG
+    .p-floatlabel label {
+        color: var(--p-text-secondary-color);
+        font-weight: 500;
+        font-family: var(--font-family);
+        transition: all 0.3s ease;
+    }
+    
+    .p-floatlabel:has(input:focus) label,
+    .p-floatlabel:has(input.p-filled) label,
+    .p-floatlabel:has(.p-inputwrapper-focus) label,
+    .p-floatlabel:has(.p-inputwrapper-filled) label {
+        color: var(--p-primary-500);
+        font-weight: 600;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        .p-floatlabel label {
+            color: var(--p-text-secondary-color);
+            opacity: 0.7;
+        }
+        
+        .p-floatlabel:has(input:focus) label,
+        .p-floatlabel:has(input.p-filled) label,
+        .p-floatlabel:has(.p-inputwrapper-focus) label,
+        .p-floatlabel:has(.p-inputwrapper-filled) label {
+            color: var(--p-primary-300);
+            opacity: 1;
+        }
+    }
+    
+    // Message component styles
+    .p-message {
+        border-radius: 12px;
+        background: var(--p-red-50);
+        border: 1px solid var(--p-red-200);
+        
+        .p-message-text {
+            color: var(--p-red-700);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            
+            .p-message-text {
+                color: var(--p-red-400);
+            }
+        }
+    }
+}

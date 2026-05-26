@@ -1,0 +1,27 @@
+<div class="assistant-message-container">
+  <!-- Message bubble (shown above avatar) -->
+  @if (hasMessage || isTyping) {
+    <div class="message-bubble-wrapper">
+      <div class="message-bubble">
+        <!-- Typing indicator -->
+        @if (isTyping) {
+          <div class="typing-indicator">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        }
+
+        <!-- Actual message with typewriter effect -->
+        @if (!isTyping && displayedMessage) {
+          <p class="message-text">{{ displayedMessage }}</p>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Assistant avatar (always shown below bubble) -->
+  <div class="assistant-avatar">
+    <img [src]="assistantImagePath" alt="Asistente" class="avatar-image" />
+  </div>
+</div>

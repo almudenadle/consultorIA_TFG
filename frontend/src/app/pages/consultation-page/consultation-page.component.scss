@@ -1,0 +1,548 @@
+// Contenedor principal - Grid Layout con header y contenido
+.consultation-page-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  width: 100%;
+  color: var(--p-text-color);
+  overflow: hidden;
+}
+
+
+
+// Header fijo - más compacto y simétrico con el grid
+.consultation-header-fixed {
+  grid-row: 1;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: var(--p-card-background, #fff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem clamp(1rem, 5vw, 2rem);
+  min-height: 56px;
+
+  .consultation-title-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+
+    .consultation-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s;
+
+      &.editable:hover {
+        color: var(--p-primary-500);
+      }
+    }
+
+    .edit-title-input {
+      font-size: 1.05rem;
+      font-weight: 400;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--p-primary-100);
+      background: var(--p-surface-100, #f6f8fa);
+      color: var(--p-text-color);
+      width: 100%;
+      max-width: 350px;
+      box-shadow: none;
+      outline: none;
+      transition: border 0.2s, background 0.2s;
+    }
+  }
+
+  // Avatar unificado con mejores colores
+  ::ng-deep p-avatar {
+    .p-avatar {
+      background: linear-gradient(135deg, var(--p-primary-500) 0%, var(--p-primary-600) 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .consultation-header-fixed {
+    background: var(--app-card-background);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
+    color: var(--app-text-primary);
+
+    .consultation-title-section {
+      .consultation-title {
+        color: var(--app-text-primary);
+
+        &.editable:hover {
+          color: var(--p-primary-300);
+        }
+      }
+
+      .edit-title-input {
+        background: var(--p-surface-900, #23272f);
+        color: var(--p-text-color, #f3f4f6);
+        border: 1px solid var(--p-primary-700, #3730a3);
+      }
+    }
+
+    // Avatar en modo oscuro con mejores colores
+    ::ng-deep p-avatar .p-avatar {
+      background: linear-gradient(135deg, var(--p-primary-400) 0%, var(--p-primary-500) 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+  }
+}
+
+// Grid Layout: 3 columnas sin filas definidas
+// Las columnas laterales son fixed, solo el centro tiene scroll natural
+.consultation-grid-layout {
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 1fr minmax(auto, 900px) 1fr;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+// Responsive breakpoints para el grid
+@media (max-width: 1399px) {
+  .consultation-grid-layout {
+    grid-template-columns: 1fr minmax(auto, 750px) 1fr;
+  }
+}
+
+@media (max-width: 1023px) {
+  .consultation-grid-layout {
+    grid-template-columns: 1fr minmax(auto, 650px) 1fr;
+  }
+}
+
+// === COLUMNA IZQUIERDA ===
+.left-sidebar {
+  grid-column: 1;
+  position: sticky;
+  top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2rem;
+  height: calc(100vh - 6rem);
+  max-width: 300px;
+  margin: 0 auto;
+  align-self: start;
+}
+
+// Responsive breakpoints para el sidebar izquierdo
+@media (max-width: 1399px) {
+  .left-sidebar {
+    max-width: 260px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .left-sidebar {
+    max-width: 220px;
+  }
+}
+
+// Área superior izquierda
+.grid-area-left-top {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none; // Firefox
+
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari, Edge
+  }
+}
+
+// === COLUMNA CENTRAL ===
+// Formulario - crece naturalmente con el contenido (scroll de página)
+.grid-area-center {
+  grid-column: 2;
+  min-width: 0;
+  padding: 2rem 0;
+}
+
+// === COLUMNA DERECHA ===
+.right-sidebar {
+  grid-column: 3;
+  position: sticky;
+  top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  height: calc(100vh - 6rem);
+  max-width: 300px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  align-self: start;
+}
+
+// Área superior - Asistente
+.grid-area-right-top {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  flex: 1;
+}
+
+// Área media - Gráfico semicircular de progreso general
+.grid-area-right-middle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex: 0 0 auto;
+  padding: 0.75rem 0;
+
+  .progress-section {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .progress-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0;
+
+    .pi-gauge {
+      font-size: 1.25rem;
+      color: var(--p-primary-500);
+      
+    }
+
+    .progress-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--app-text-primary);
+    }
+  }
+
+  .chart-wrapper.half-doughnut {
+    position: relative;
+    width: 100%;
+    max-width: 150px;
+    aspect-ratio: 2 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+
+    app-chart {
+      display: block;
+      width: 100%;
+      height: 100%;
+
+      ::ng-deep .chart-container {
+        height: 100% !important;
+      }
+    }
+
+    .chart-score-overlay {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 10;
+
+      &.gauge-score-overlay .chart-score-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--p-text-color);
+        line-height: 1;
+      }
+    }
+  }
+}
+
+// Responsive para el gráfico del medio
+@media (max-width: 1399px) {
+  .grid-area-right-middle {
+    .progress-header {
+      .pi-gauge {
+        font-size: 1.1rem;
+      }
+
+      .progress-title {
+        font-size: 0.9rem;
+      }
+    }
+
+    .chart-wrapper.half-doughnut {
+      max-width: 130px;
+
+      .chart-score-overlay {
+        bottom: 10px;
+
+        &.gauge-score-overlay .chart-score-value {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1023px) {
+  .grid-area-right-middle {
+    .progress-header {
+      .pi-gauge {
+        font-size: 1rem;
+      }
+
+      .progress-title {
+        font-size: 0.85rem;
+      }
+    }
+
+    .chart-wrapper.half-doughnut {
+      max-width: 110px;
+
+      .chart-score-overlay {
+        bottom: 8px;
+
+        &.gauge-score-overlay .chart-score-value {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+.kpi-charts-wrapper {
+  width: 100%;
+  padding: 1rem;
+
+  .charts-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--app-page-background);
+    //padding-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    .pi-chart-pie {
+      font-size: 1.25rem;
+      color: var(--p-primary-500);
+    }
+
+    .charts-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  .charts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .kpi-chart-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .chart-wrapper {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+
+    app-chart {
+      display: block;
+      width: 100%;
+      height: 100%;
+
+      ::ng-deep .chart-container {
+        height: 100% !important;
+      }
+    }
+  }
+
+  .chart-score-overlay {
+    position: absolute;
+    top: 45%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+
+    .chart-score-value {
+      color: var(--p-text-color);
+      line-height: 1;
+      font-size: 0.70rem;
+      font-weight: 700;
+    }
+  }
+
+
+  .area-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: left;
+    margin: 0;
+  }
+}
+
+
+.grid-area-right-bottom {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  scrollbar-width: none; // Firefox
+
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari, Edge
+  }
+}
+
+// Estilo del botón de volver
+.back-to-home-button {
+  background: var(--p-surface-100) !important;
+  color: var(--p-text-color) !important;
+  border: 1px solid var(--p-surface-300) !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+
+  .p-button-icon {
+    font-size: 1.1rem !important;
+    color: var(--p-primary-500) !important;
+  }
+
+  .p-button-label {
+    font-size: 0.95rem !important;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--p-primary-500) !important;
+    color: white !important;
+    border-color: var(--p-primary-500) !important;
+    transform: translateX(-4px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+
+    .p-button-icon {
+      color: white !important;
+      animation: arrow-bounce 0.6s ease-in-out infinite;
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: translateX(-2px) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background: var(--p-surface-800) !important;
+    border-color: var(--p-surface-700) !important;
+
+    &:hover:not(:disabled) {
+      background: var(--p-primary-600) !important;
+      border-color: var(--p-primary-600) !important;
+    }
+  }
+}
+
+// Animación de la flecha
+@keyframes arrow-bounce {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(-3px);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .consultation-page-container {
+    padding: 1rem 0.75rem;
+  }
+
+  // En mobile: layout de 1 columna, asistente fixed abajo
+  .consultation-grid-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .grid-area-center {
+    order: 1;
+    overflow-y: visible;
+  }
+
+  .left-sidebar,
+  .right-sidebar,
+  .grid-area-left-top,
+  .grid-area-right-top,
+  .grid-area-right-middle {
+    display: none; // Ocultar áreas laterales en mobile
+  }
+
+  .grid-area-right-bottom {
+    order: 2;
+    position: fixed;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    z-index: 100;
+  }
+
+  .back-to-home-button {
+    width: 100%;
+    justify-content: center !important;
+
+    .p-button-label {
+      flex: 1;
+    }
+  }
+}

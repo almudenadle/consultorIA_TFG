@@ -1,0 +1,127 @@
+<!--
+  Dynamic Form Container Component Template
+  
+  This component manages the display and submission of dynamic forms in a consultation workflow.
+  It shows:
+  - Loading state while fetching form data
+  - Error messages if form loading fails
+  - History of previously submitted forms with their responses
+  - Current active form for user input
+  - Submission controls
+  
+  The component handles multiple form submissions in sequence, maintaining a history
+  of all previous submissions for context and review.
+-->
+<div class="dynamic-form-container">
+  <!-- Loading State: Displayed while form data is being fetched -->
+  @if (isLoading()) {
+  <div class="loading-container">
+    <p-progressSpinner />
+    <p>Cargando formulario...</p>
+  </div>
+  }
+
+  <!-- Error State: Displayed when form loading encounters an error -->
+  <!-- El mensaje de error ahora se muestra en el popup global -->
+
+  <!-- Main Content: Form history and active form -->
+  @else {
+    <!-- Scroll container for the entire history -->
+    <div class="forms-scroll-container">
+      <!-- Submitted Forms -->
+      @for (submittedForm of submittedForms(); track $index) {
+        <div class="form-card submitted-form" [attr.data-form-index]="$index">
+          <div class="form-card-header">
+            <div class="header-badges">
+              <!-- Etiqueta de Área -->
+              <p-tag
+                [value]="submittedForm.areaName"
+                [style]="{'background': getRgbaColor(submittedForm.areaName), 'color': getHexColor(submittedForm.areaName)}"
+              />
+            </div>
+            
+            <span class="form-status-badge status-completed">
+              <i class="pi pi-check-circle"></i>
+              Completado
+            </span>
+          </div>
+          
+          <div class="form-card-body">
+            @for (field of submittedForm.fields; track field.idField) {
+              <div class="form-field-readonly">
+                <label class="field-label-readonly">
+                  {{ field.question }}
+                  @if (field.required) {
+                    <span class="required-indicator">*</span>
+                  }
+                </label>
+                
+                <!-- Valor simple (select o textarea) -->
+                @if (!isArrayValue(submittedForm.values[field.idField])) {
+                  <div class="field-value-readonly">
+                    {{ submittedForm.values[field.idField] || '—' }}
+                  </div>
+                }
+
+                <!-- Valor múltiple (multiselect) - renderizar como lista -->
+                @if (isArrayValue(submittedForm.values[field.idField])) {
+                  <div class="field-value-readonly multiselect-list">
+                    @for (item of getArrayItems(submittedForm.values[field.idField]); track item) {
+                      <div class="multiselect-item">
+                        <i class="pi pi-check-circle"></i>
+                        <span>{{ item }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Active Form -->
+      @if (formGroup && questions && questions.length > 0) {
+        <div class="form-card active-form" [attr.data-form-index]="submittedForms().length">
+          <div class="form-card-header">
+            <div class="header-badges">
+              <!-- Etiqueta de Área del formulario activo -->
+              <p-tag
+                [value]="currentAreaName"
+                [style]="{'background': getRgbaColor(currentAreaName), 'color': getHexColor(currentAreaName)}"
+              />
+              
+            </div>
+            
+            <span class="form-status-badge status-active">
+              <i class="pi pi-pencil"></i>
+              En progreso
+            </span>
+          </div>
+          
+          <form [formGroup]="formGroup" class="form-card-body">
+            <app-dynamic-form-question
+              [formGroup]="formGroup"
+              [fields]="questions"
+              [isFirstForm]="isFirstForm"
+            />
+
+            <div class="form-actions">
+              <p-button
+                label="Enviar respuestas"
+                icon="pi pi-send"
+                [disabled]="!formGroup.valid || isSubmitting()"
+                [loading]="isSubmitting()"
+                (onClick)="onSubmit()"
+              />
+            </div>
+          </form>
+        </div>
+      } 
+      @else if (submittedForms().length === 0) {
+        <p-message severity="info" text="No hay preguntas disponibles" />
+      }
+    </div>
+
+  }
+</div>

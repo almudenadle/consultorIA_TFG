@@ -1,0 +1,152 @@
+<div class="landing-container">
+  <header>
+    <nav>
+      <div class="logo">
+        <i class="pi pi-sparkles" style="margin-right: 0.5rem"></i>
+        ConsultorIA
+      </div>
+
+      <div class="nav-actions">
+        <p-button
+          label="Comenzar Gratis"
+          [rounded]="true"
+          (onClick)="navigateToRegister()"
+        />
+
+        <p-button
+          label="Iniciar Sesión"
+          [rounded]="true"
+          [outlined]="true"
+          (onClick)="navigateToLogin()"
+        />
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Transforma Tu Negocio con
+          <span class="gradient-text">Inteligencia Artificial</span>
+        </h1>
+
+        <p class="hero-description">
+          Consultoría empresarial personalizada con IA. Optimiza procesos, toma
+          mejores decisiones y acelera el crecimiento de tu empresa.
+        </p>
+      </div>
+
+      <div class="hero-visual">
+        <div class="floating-card card-1">
+          <i class="pi pi-chart-line"></i>
+          <span>Análisis en Tiempo Real</span>
+        </div>
+        <div class="floating-card card-2">
+          <i class="pi pi-sparkles"></i>
+          <span>IA Personalizada</span>
+        </div>
+        <div class="floating-card card-3">
+          <i class="pi pi-shield"></i>
+          <span>Datos Seguros</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="section-header">
+        <h2>¿Por Qué Elegirnos?</h2>
+        <p>Herramientas potentes para impulsar tu negocio</p>
+      </div>
+
+      <div class="features-grid">
+        <p-card class="feature-card">
+          <div class="feature-icon primary">
+            <i class="pi pi-lightbulb"></i>
+          </div>
+          <h3>Consultoría Personalizada</h3>
+          <p>
+            Recibe recomendaciones adaptadas a las necesidades específicas de tu
+            negocio, generadas por algoritmos avanzados de IA.
+          </p>
+        </p-card>
+
+        <p-card class="feature-card">
+          <div class="feature-icon secondary">
+            <i class="pi pi-bolt"></i>
+          </div>
+          <h3>Resultados Instantáneos</h3>
+          <p>
+            Obtén análisis y recomendaciones en minutos, no en semanas. Acelera
+            tu toma de decisiones estratégicas.
+          </p>
+        </p-card>
+
+        <p-card class="feature-card">
+          <div class="feature-icon accent">
+            <i class="pi pi-chart-bar"></i>
+          </div>
+          <h3>Análisis Profundo</h3>
+          <p>
+            Comprende tu negocio en profundidad con conocimientos basados en
+            datos y tendencias de mercado.
+          </p>
+        </p-card>
+
+        <p-card class="feature-card">
+          <div class="feature-icon primary">
+            <i class="pi pi-sync"></i>
+          </div>
+          <h3>Mejora Continua</h3>
+          <p>
+            Nuestra IA aprende de tus interacciones para proporcionar
+            recomendaciones cada vez más precisas.
+          </p>
+        </p-card>
+
+        <p-card class="feature-card">
+          <div class="feature-icon secondary">
+            <i class="pi pi-shield"></i>
+          </div>
+          <h3>Seguridad Garantizada</h3>
+          <p>
+            Tus datos están protegidos con los más altos estándares de seguridad
+            y privacidad.
+          </p>
+        </p-card>
+
+        <p-card class="feature-card">
+          <div class="feature-icon accent">
+            <i class="pi pi-users"></i>
+          </div>
+          <h3>Soporte Dedicado</h3>
+          <p>
+            Equipo experto disponible para ayudarte a maximizar el valor de
+            nuestra plataforma.
+          </p>
+        </p-card>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="cta-content">
+        <h2>¿Listo para transformar tu negocio?</h2>
+        <p>Únete a cientos de empresas que ya confían en nuestra plataforma</p>
+        <div class="cta-actions">
+          <p-button
+            label="Comenzar Ahora"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            [rounded]="true"
+            size="large"
+            (onClick)="navigateToRegister()"
+          />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 ConsultorIA. Todos los derechos reservados.</p>
+  </footer>
+</div>

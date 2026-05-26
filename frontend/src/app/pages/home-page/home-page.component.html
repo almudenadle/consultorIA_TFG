@@ -1,0 +1,218 @@
+<div class="home-container">
+  <p-toast position="top-right" />
+
+  <header class="home-header">
+    <nav class="navbar">
+      <div class="logo">
+        <i class="pi pi-sparkles"></i>
+        ConsultorIA
+      </div>
+
+      <div class="search-bar">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Buscar consultorías..."
+            class="search-input"
+          />
+        </span>
+      </div>
+
+      <div class="user-menu">
+        <p-menu #userMenu [popup]="true" [model]="userMenuItems"></p-menu>
+        <button
+          type="button"
+          pButton
+          class="user-menu-btn"
+          (click)="userMenu.toggle($event)"
+        >
+          <p-avatar [label]="userInitials" shape="circle"></p-avatar>
+          <span class="user-name">{{ userName }}</span>
+          <i class="pi pi-chevron-down"></i>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="home-content">
+    <section class="dashboard">
+      <div class="consultations-section">
+        <div class="section-header">
+          <div class="header-left">
+            <h2>Tus Consultorías</h2>
+          </div>
+          <p-button
+            label="Nueva Consultoría"
+            icon="pi pi-plus"
+            styleClass="btn-primary"
+            (onClick)="consultation()"
+          ></p-button>
+        </div>
+
+        <div class="filter-buttons">
+          <p-button
+            [label]="'Todas (' + totalCount + ')'"
+            [rounded]="true"
+            [class]="isFilterActive('all') ? 'filter-active' : ''"
+            [outlined]="!isFilterActive('all')"
+            (onClick)="setFilter('all')"
+          >
+          </p-button>
+          <p-button
+            [label]="'Activas (' + activeCount + ')'"
+            [rounded]="true"
+            [class]="isFilterActive('active') ? 'filter-active' : ''"
+            [outlined]="!isFilterActive('active')"
+            (onClick)="setFilter('active')"
+          >
+          </p-button>
+          <p-button
+            [label]="'Finalizadas (' + finishedCount + ')'"
+            [rounded]="true"
+            [class]="isFilterActive('finished') ? 'filter-active' : ''"
+            [outlined]="!isFilterActive('finished')"
+            (onClick)="setFilter('finished')"
+          >
+          </p-button>
+        </div>
+
+        @if (!consultings) {
+          <div class="loading-state">
+            <p-progressSpinner />
+            <p>Cargando consultorías...</p>
+          </div>
+        }
+
+        @else {
+          @if (filteredConsultings && filteredConsultings.length > 0) {
+            <div class="consultations-grid">
+              @for (consulting of paginatedConsultings; track consulting.id) {
+                <div
+                  class="consulting-card"
+                  (click)="consultation(consulting.id)"
+                >
+                  <div class="card-decoration"></div>
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      {{ consulting.title || "Consultoría sin título" }}
+                    </h3>
+                    <span
+                      class="status-badge"
+                      [ngClass]="getStatusClass(consulting)"
+                    >
+                      {{ getStatusText(consulting) }}
+                    </span>
+                  </div>
+                  <p class="card-date">
+                    Creada el {{ formatDate(consulting.date) }}
+                  </p>
+
+                  @if (consulting.statusCons === 0) {
+                    <div class="card-progress">
+                      <div class="progress-header">
+                        <span class="progress-label">Progreso</span>
+                      </div>
+                      <p-progressBar
+                        [value]="consulting.averageScore"
+                        [showValue]="false"
+                      ></p-progressBar>
+                    </div>
+                  }
+
+                  <div class="card-actions">
+                    <p-button
+                      icon="pi pi-pencil"
+                      [text]="true"
+                      label="Editar"
+                      size="small"
+                      (onClick)="
+                        $event.stopPropagation();
+                        updateConsultingName(
+                          consulting.id,
+                          consulting.title || '',
+                          $event
+                        )
+                      "
+                    >
+                    </p-button>
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      severity="danger"
+                      size="small"
+                      (onClick)="
+                        $event.stopPropagation();
+                        deleteConsulting(consulting.id, $event)
+                      "
+                    >
+                    </p-button>
+                  </div>
+                </div>
+              }
+
+              @if (isLastPage) {
+                <div class="consulting-card-new" (click)="consultation()">
+                  <div class="new-card-icon">
+                    <i class="pi pi-plus"></i>
+                  </div>
+                  <h3>Crear Nueva Consultoría</h3>
+                </div>
+              }
+            </div>
+
+            <div class="pagination-container">
+              <p-paginator
+                [rows]="rowsPerPage"
+                [totalRecords]="filteredConsultings.length"
+                [first]="currentPage * rowsPerPage"
+                (onPageChange)="onPageChange($event)"
+              >
+              </p-paginator>
+            </div>
+          } @else {
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <h3>No se encontraron consultorías</h3>
+              <p>Inicia tu primera consultoría para ver resultados aquí.</p>
+            </div>
+          }
+        }
+      </div>
+    </section>
+  </main>
+
+  <footer class="home-footer">
+    <p>© 2026 ConsultorIA. Todos los derechos reservados.</p>
+  </footer>
+</div>
+
+<app-generic-dialog
+  [(visible)]="showTitleDialog"
+  [title]="getDialogTitle()"
+  [icon]="isEditingMode ? 'pi pi-pencil' : 'pi pi-sparkles'"
+  [description]="getDialogDescription()"
+  [showInput]="true"
+  [inputLabel]="isEditingMode ? 'Nuevo nombre' : 'Título de la consultoría'"
+  [inputPlaceholder]="getInputPlaceholder()"
+  [(inputValue)]="consultationTitle"
+  [inputOptional]="!isEditingMode"
+  [inputDisabled]="isSubmittingTitle"
+  [submitOnEnter]="true"
+  [buttons]="titleDialogButtons"
+  styleClass="consultation-title-dialog"
+  (onHide)="handleCancel()"
+/>
+
+<app-generic-dialog
+  [(visible)]="showDeleteDialog"
+  [title]="'Eliminar Consultoría'"
+  [icon]="'pi pi-exclamation-triangle'"
+  [description]="deleteDialogDescription"
+  [warningMessage]="'Esta acción eliminará permanentemente todos los datos asociados y no se podrá deshacer.'"
+  [buttons]="deleteDialogButtons"
+  styleClass="delete-confirmation-dialog"
+  (onHide)="cancelDelete()"
+/>

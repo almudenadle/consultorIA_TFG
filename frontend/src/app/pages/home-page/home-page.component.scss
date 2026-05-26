@@ -1,0 +1,1271 @@
+// ============================================================================
+// VARIABLES - Tokens de diseño para consistencia visual en toda la página
+// ============================================================================
+$primary-gradient: linear-gradient(135deg, var(--p-primary-500) 0%, var(--p-sec1-500) 100%);
+$primary-gradient-hover: linear-gradient(135deg, var(--p-sec1-500) 0%, var(--p-sec1-600) 100%);
+$transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$border-radius-lg: 20px;
+$border-radius-md: 16px;
+$border-radius-sm: 12px;
+
+// ============================================================================
+// ANIMATIONS - Keyframes reutilizables para efectos visuales
+// ============================================================================
+
+@keyframes sparkle {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    transform: translateY(-30px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(30px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.9);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+
+  0%,
+  100% {
+    transform: translateX(-50%) translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(-50%) translateX(100%);
+  }
+}
+
+// ============================================================================
+// LAYOUT PRINCIPAL - Contenedor con fondo animado
+// ============================================================================
+
+:host {
+  display: block;
+}
+
+.home-container {
+  min-height: 100vh;
+  font-family: var(--font-family);
+  position: relative;
+  overflow: hidden;
+  background: var(--app-background);
+}
+
+// ============================================================================
+// HEADER - Barra de navegación sticky con branding y búsqueda
+// ============================================================================
+
+.home-header {
+  background: var(--app-header-background);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--app-card-border);
+}
+
+.navbar {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.25rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Logo con animación
+.logo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--app-text-primary);
+  display: flex;
+  align-items: center;
+  letter-spacing: -0.5px;
+  user-select: none;
+  transition: $transition-default;
+
+  i {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+    animation: sparkle 2s ease-in-out infinite;
+    color: var(--p-primary-500);
+  }
+
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+// Barra de búsqueda en el header
+.search-bar {
+  flex: 1;
+  max-width: 600px;
+  margin: 0 2rem;
+
+  .p-input-icon-left {
+    width: 100%;
+    position: relative;
+
+    i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.75rem;
+      border-radius: $border-radius-sm;
+      transition: $transition-default;
+    }
+  }
+}
+
+// Botón del menú de usuario con efectos mejorados
+.user-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1.125rem !important;
+  border-radius: 50px !important;
+  transition: $transition-default;
+  min-width: 200px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--p-surface-100) !important;
+  border: 1px solid var(--p-surface-200) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    background: var(--p-surface-200) !important;
+    border-color: var(--p-surface-300) !important;
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+
+  .user-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--app-text-primary);
+    transition: letter-spacing 0.3s ease;
+  }
+
+  i.pi-chevron-down {
+    font-size: 0.75rem;
+    color: var(--app-text-primary) !important;
+    opacity: 0.7;
+  }
+
+  // Avatar unificado con mejores colores
+  ::ng-deep p-avatar {
+    .p-avatar {
+      background: linear-gradient(135deg, var(--p-primary-500) 0%, var(--p-primary-600) 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+// Estilos específicos del botón de usuario en modo oscuro
+@media (prefers-color-scheme: dark) {
+  .user-menu-btn {
+    background: var(--app-card-background) !important;
+    border-color: var(--app-card-border) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      background: rgb(40, 40, 55) !important;
+      border-color: rgb(55, 55, 75) !important;
+    }
+    
+    // Avatar en modo oscuro con mejores colores
+    ::ng-deep p-avatar {
+      .p-avatar {
+        background: linear-gradient(135deg, var(--p-primary-400) 0%, var(--p-primary-500) 100%);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.15);
+      }
+    }
+  }
+}
+
+// ============================================================================
+// MENÚ DESPLEGABLE DEL USUARIO
+// ============================================================================
+
+::ng-deep .p-menu.p-menu-overlay {
+  // El menú tendrá el mismo ancho que el botón de perfil
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  margin-top: 0.5rem !important;
+  padding: 0 !important;
+  transform: translateX(20px) !important;
+
+  // Bordes redondeados
+  border-radius: 14px !important;
+
+  // Lista de items
+  .p-menu-list {
+    padding: 0.5rem !important;
+
+    .p-menu-item {
+      margin-bottom: 0.125rem !important;
+
+      .p-menu-item-content {
+        .p-menu-item-link {
+          padding: 0.5rem 0.75rem !important;
+          gap: 0.5rem !important;
+          display: flex !important;
+          align-items: center !important;
+          
+          .p-menu-item-icon {
+            width: 1.5rem !important;
+            height: 1.5rem !important;
+            font-size: 0.8rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          
+          .p-menu-item-label {
+            font-size: 0.85rem !important;
+            line-height: 1.5rem !important;
+          }
+        }
+      }
+    }
+    
+    // Separador
+    .p-menu-separator {
+      margin: 0.375rem 0.375rem !important;
+    }
+  }
+}
+
+// Animación personalizada para el menú
+@keyframes menuSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Estilos para tema oscuro del menú
+@media (prefers-color-scheme: dark) {
+  ::ng-deep .p-menu.p-menu-overlay {
+    background: var(--app-card-background) !important;
+    border-color: var(--app-card-border) !important;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.4),
+      0 8px 24px rgba(0, 0, 0, 0.3),
+      0 2px 8px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+
+    &::before {
+      background: linear-gradient(135deg,
+          rgba(var(--p-primary-400-rgb), 0.4) 0%,
+          rgba(var(--p-sec1-400-rgb), 0.4) 100%);
+    }
+
+    .p-menuitem-link {
+      color: var(--app-text-primary);
+
+      .p-menuitem-icon {
+        background-color: rgba(var(--p-primary-800-rgb), 0.4) !important;
+      }
+
+      &:hover {
+        background: rgb(40, 40, 55);
+
+        &::before {
+          background: linear-gradient(135deg,
+              rgba(var(--p-primary-400-rgb), 0.15),
+              rgba(var(--p-sec1-400-rgb), 0.15));
+        }
+
+        .p-menuitem-icon {
+          background-color: rgba(var(--p-primary-700-rgb), 0.5) !important;
+        }
+      }
+    }
+
+    .p-menuitem:last-child .p-menuitem-link {
+      .p-menuitem-icon {
+        background-color: rgba(var(--p-red-900-rgb), 0.4) !important;
+      }
+
+      &:hover .p-menuitem-icon {
+        background-color: rgba(var(--p-red-800-rgb), 0.5) !important;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// FORZAR ESTILOS DEL MENÚ CON MÁXIMA ESPECIFICIDAD
+// ============================================================================
+
+// Forzar el tamaño y espaciado del menú con especificidad extrema
+::ng-deep .p-component.p-menu.p-menu-overlay,
+::ng-deep p-menu .p-menu.p-menu-overlay {
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  padding: 0 !important;
+
+  .p-menu-list {
+    padding: 0.5rem !important;
+
+    .p-menuitem {
+      margin-bottom: 0.125rem !important;
+
+      .p-menuitem-content {
+        .p-menuitem-link {
+          padding: 0.5rem 0.75rem !important;
+          border-radius: 8px !important;
+          gap: 0.5rem !important;
+          display: flex !important;
+          align-items: center !important;
+
+          .p-menuitem-icon {
+            width: 1.5rem !important;
+            height: 1.5rem !important;
+            font-size: 0.8rem !important;
+            border-radius: 6px !important;
+            min-width: 1.5rem !important;
+            max-width: 1.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+
+          .p-menuitem-text,
+          .p-menuitem-label {
+            font-size: 0.85rem !important;
+            line-height: 1.5rem !important;
+          }
+        }
+      }
+    }
+
+    .p-menuitem-separator {
+      margin: 0.375rem 0.375rem !important;
+    }
+  }
+}
+
+// ============================================================================
+// CONTENIDO PRINCIPAL - Dashboard y secciones
+// ============================================================================
+
+.home-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+// Sección de bienvenida con título animado
+.welcome-section {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeInDown 0.8s ease-out;
+
+  h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    color: var(--p-text-color);
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+
+  p {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--p-text-color);
+    line-height: 1.7;
+    opacity: 0.8;
+  }
+}
+
+// Contenedor del dashboard con animación
+.dashboard {
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+// Sección de consultorías
+.consultations-section {
+  border: none;
+
+  // Estados de carga y vacío
+  .loading-state,
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 2rem;
+
+    i {
+      font-size: 5rem;
+      color: var(--p-surface-500);
+      margin-bottom: 1.5rem;
+      opacity: 0.7;
+    }
+
+    h3 {
+      font-size: 1.625rem;
+      font-weight: 700;
+      margin: 0 0 0.75rem 0;
+      color: var(--p-text-color);
+    }
+
+    p {
+      font-size: 1.0625rem;
+      margin: 0.5rem 0 0 0;
+      color: var(--p-text-color);
+      opacity: 0.7;
+      font-weight: 500;
+    }
+  }
+}
+
+// ============================================================================
+// HEADER DE SECCIÓN - Título y botón de nueva consultoría
+// ============================================================================
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--p-text-color);
+      margin: 0;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      // Barra decorativa vertical antes del título
+      &::before {
+        content: '';
+        width: 4px;
+        height: 32px;
+        background: $primary-gradient;
+        border-radius: 3px;
+      }
+    }
+  }
+
+  // Botón principal "Nueva Consultoría" con efectos avanzados
+  ::ng-deep .p-button.btn-primary {
+    font-weight: 700;
+    padding: 1rem 2.75rem;
+    font-size: 1.0625rem;
+    border-radius: $border-radius-md;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.3px;
+
+    &:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    &:active {
+      transform: translateY(-2px) scale(1);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+// ============================================================================
+// FILTROS - Botones para filtrar consultorías por estado
+// ============================================================================
+
+.filter-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.5rem;
+  overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
+  z-index: 10; // Para que queden sobre las tarjetas al hacer hover
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--p-surface-400);
+    border-radius: 10px;
+  }
+
+  ::ng-deep .p-button {
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
+    white-space: nowrap;
+    transition: $transition-default;
+    position: relative;
+
+    &.p-button-outlined {
+      border-color: var(--p-primary-400);
+      color: var(--p-primary-600);
+      background: transparent !important;
+
+      .p-button-label {
+        color: var(--p-primary-600);
+      }
+
+      &:hover {
+        transform: translateY(-2px) scale(1.05);
+        z-index: 20;
+        background: var(--p-primary-50) !important;
+        border-color: var(--p-primary-600) !important;
+        color: var(--p-primary-700);
+
+        .p-button-label {
+          color: var(--p-primary-700);
+        }
+      }
+    }
+
+    &:not(.p-button-outlined) {
+      background: var(--p-primary-500) !important;
+      border-color: var(--p-primary-500) !important;
+      color: white !important;
+
+      .p-button-label {
+        color: white !important;
+      }
+
+      &:hover {
+        transform: translateY(-2px) scale(1.05);
+        background: var(--p-primary-600) !important;
+      }
+    }
+  }
+}
+
+// Estilos específicos para filtros en modo oscuro
+@media (prefers-color-scheme: dark) {
+  .filter-buttons {
+    ::ng-deep .p-button {
+      &.p-button-outlined {
+        border-color: rgba(255, 255, 255, 0.3);
+        color: rgba(255, 255, 255, 0.9);
+
+        .p-button-label {
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+          border-color: rgba(255, 255, 255, 0.5) !important;
+          color: white;
+
+          .p-button-label {
+            color: white;
+          }
+        }
+      }
+
+      &:not(.p-button-outlined) {
+        color: white !important;
+
+        .p-button-label {
+          color: white !important;
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// GRID DE CONSULTORÍAS - Layout responsive de tarjetas
+// ============================================================================
+
+.consultations-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+// ============================================================================
+// TARJETA DE CONSULTORÍA - Card individual con estados y acciones
+// ============================================================================
+
+.consulting-card {
+  background: var(--app-card-background);
+  border-radius: $border-radius-lg;
+  padding: 1.5rem;
+  border: 1px solid var(--app-card-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+
+  // Barra decorativa superior con gradiente
+  .card-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: $primary-gradient;
+    transition: height 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: var(--p-primary-400);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    .card-decoration {
+      height: 6px;
+    }
+
+    .card-title {
+      color: var(--p-primary-600);
+    }
+  }
+
+  &:active {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+
+    // Badge de estado (Active = 0, Finished = 1)
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 24px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: $transition-default;
+      flex-shrink: 0;
+
+      &.status-active {
+        background: var(--p-green-100);
+        color: var(--p-green-800);
+      }
+
+      &.status-finished {
+        background: var(--p-indigo-100);
+        color: var(--p-indigo-800);
+      }
+    }
+  }
+
+  .card-title {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: var(--p-text-color);
+    margin: 0;
+    line-height: 1.4;
+    transition: $transition-default;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-date {
+    font-size: 0.9375rem;
+    color: var(--p-text-color);
+    opacity: 0.6;
+    margin: 0 0 1.25rem 0;
+    font-weight: 500;
+  }
+
+  // Barra de progreso para consultorías activas
+  .card-progress {
+    margin-bottom: 1.25rem;
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+
+      .progress-label {
+        font-size: 0.8125rem;
+        color: var(--p-text-color);
+        opacity: 0.7;
+        font-weight: 600;
+      }
+
+      .progress-value {
+        font-size: 0.875rem;
+        color: var(--p-primary-600);
+        font-weight: 700;
+      }
+    }
+
+    .p-progressbar {
+      height: 14px;
+      border-radius: 10px;
+      background: var(--p-surface-200);
+
+      .p-progressbar-value {
+        background: $primary-gradient;
+        border-radius: 10px;
+        transition: width 0.6s ease-in-out;
+      }
+    }
+  }
+
+  // Botones de reporte para consultorías finalizadas
+  .card-report-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+
+    ::ng-deep .p-button {
+      flex: 1;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.625rem 0.875rem;
+      border-radius: 10px;
+      transition: $transition-default;
+
+      .p-button-icon {
+        font-size: 1rem;
+      }
+
+      .p-button-label {
+        font-size: 0.8125rem;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  // Acciones de la tarjeta (editar, eliminar)
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--app-card-border);
+    margin-top: auto;
+
+    ::ng-deep .p-button {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      padding: 0.625rem 1rem;
+      transition: $transition-default;
+      background: transparent !important;
+
+      .p-button-icon {
+        font-size: 1.125rem;
+      }
+
+      &:hover {
+        transform: scale(1.05);
+        background: transparent !important;
+      }
+
+      &:focus {
+        box-shadow: none !important;
+      }
+
+      // Botón de eliminar: sin fondo, icono rojo apagado
+      &.p-button-danger,
+      &.p-button-text.p-button-danger {
+        background: transparent !important;
+        border: none !important;
+        
+        .p-button-icon {
+          color: #c94a4a !important; // Rojo apagado para mejor visibilidad
+        }
+
+        &:hover {
+          background: transparent !important;
+          
+          .p-button-icon {
+            color: #e65c5c !important; // Ligeramente más brillante en hover
+          }
+        }
+
+        &:focus {
+          box-shadow: none !important;
+        }
+      }
+    }
+  }
+}
+
+// Tarjeta especial para crear nueva consultoría (dashed border)
+.consulting-card-new {
+  border-radius: $border-radius-lg;
+  padding: 2rem 1.5rem;
+  border: 2px dashed var(--p-surface-300);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 280px;
+
+  &:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: var(--p-primary-400);
+
+    .new-card-icon {
+      transform: scale(1.15);
+    }
+
+    h3 {
+      color: var(--p-primary-600);
+    }
+  }
+
+  &:active {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .new-card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    i {
+      font-size: 2rem;
+      transition: color 0.3s ease;
+    }
+  }
+
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+    transition: $transition-default;
+  }
+}
+
+// ============================================================================
+// PAGINACIÓN - Controles para navegar entre páginas
+// ============================================================================
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+
+  ::ng-deep .p-paginator {
+    background: transparent;
+    border: none;
+    padding: 1rem;
+
+    .p-paginator-pages .p-paginator-page {
+      min-width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      margin: 0 0.25rem;
+      font-weight: 600;
+      color: var(--p-text-color);
+      transition: $transition-default;
+
+      &:hover {
+        background: var(--p-surface-200);
+        transform: translateY(-2px);
+      }
+
+      &.p-highlight {
+        background: $primary-gradient !important;
+      }
+    }
+
+    .p-paginator-first,
+    .p-paginator-prev,
+    .p-paginator-next,
+    .p-paginator-last {
+      min-width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      margin: 0 0.25rem;
+      color: var(--p-text-color);
+      transition: $transition-default;
+
+      &:not(.p-disabled):hover {
+        background: var(--p-surface-200);
+        color: var(--p-primary-600);
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+// ============================================================================
+// FOOTER - Información al final de la página
+// ============================================================================
+
+.home-footer {
+  margin-top: auto;
+  padding: 2rem 0;
+  text-align: center;
+  font-size: 0.875rem;
+  backdrop-filter: blur(10px);
+
+  p {
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+// ============================================================================
+// RESPONSIVE DESIGN - Adaptaciones para diferentes tamaños de pantalla
+// ============================================================================
+
+@media (max-width: 992px) {
+  .home-content {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .welcome-section h1 {
+    font-size: 2.5rem;
+  }
+
+  .welcome-section p {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem 1.5rem;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  // Ocultar barra de búsqueda en móvil
+  .search-bar {
+    display: none;
+  }
+
+  // Ocultar nombre de usuario en móvil
+  .user-menu-btn .user-name {
+    display: none;
+  }
+
+  .home-content {
+    padding: 2rem 1rem;
+  }
+
+  .welcome-section {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  // Ajustes del menú desplegable en móvil
+  ::ng-deep .p-menu.p-menu-overlay {
+    width: auto !important;
+    min-width: 200px !important;
+    max-width: calc(100vw - 2rem) !important;
+
+    .p-menu-list {
+      .p-menuitem .p-menuitem-link {
+        padding: 0.5rem 0.75rem !important;
+        display: flex !important;
+        align-items: center !important;
+
+        .p-menuitem-icon {
+          font-size: 0.8rem !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+
+        .p-menuitem-text {
+          font-size: 0.85rem !important;
+          line-height: 1.5rem !important;
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// BOTONES DE REPORTE Y ACCIONES - Estilos específicos
+// ============================================================================
+
+// Botón "Ver informe" - verde
+.card-report-actions ::ng-deep .p-button.p-button-outlined.p-button-success {
+  border-color: var(--p-green-500) !important;
+  color: var(--p-green-600) !important;
+  background: var(--p-green-50) !important;
+  
+  .p-button-icon {
+    color: var(--p-green-600) !important;
+  }
+  
+  .p-button-label {
+    color: var(--p-green-600) !important;
+  }
+  
+  &:hover {
+    background: var(--p-green-100) !important;
+    border-color: var(--p-green-600) !important;
+    color: var(--p-green-700) !important;
+    
+    .p-button-icon {
+      color: var(--p-green-700) !important;
+    }
+    
+    .p-button-label {
+      color: var(--p-green-700) !important;
+    }
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    border-color: var(--p-green-400) !important;
+    color: var(--p-green-400) !important;
+    background: rgba(34, 197, 94, 0.1) !important;
+    
+    .p-button-icon {
+      color: var(--p-green-400) !important;
+    }
+    
+    .p-button-label {
+      color: var(--p-green-400) !important;
+    }
+    
+    &:hover {
+      background: rgba(34, 197, 94, 0.2) !important;
+      border-color: var(--p-green-300) !important;
+      color: var(--p-green-300) !important;
+      
+      .p-button-icon {
+        color: var(--p-green-300) !important;
+      }
+      
+      .p-button-label {
+        color: var(--p-green-300) !important;
+      }
+    }
+  }
+}
+
+// Botón "Enviar informe" - azul
+.card-report-actions ::ng-deep .p-button.p-button-outlined.p-button-info {
+  border-color: var(--p-blue-500) !important;
+  color: var(--p-blue-600) !important;
+  background: var(--p-blue-50) !important;
+  
+  .p-button-icon {
+    color: var(--p-blue-600) !important;
+  }
+  
+  .p-button-label {
+    color: var(--p-blue-600) !important;
+  }
+  
+  &:hover {
+    background: var(--p-blue-100) !important;
+    border-color: var(--p-blue-600) !important;
+    color: var(--p-blue-700) !important;
+    
+    .p-button-icon {
+      color: var(--p-blue-700) !important;
+    }
+    
+    .p-button-label {
+      color: var(--p-blue-700) !important;
+    }
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    border-color: var(--p-blue-400) !important;
+    color: var(--p-blue-400) !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+    
+    .p-button-icon {
+      color: var(--p-blue-400) !important;
+    }
+    
+    .p-button-label {
+      color: var(--p-blue-400) !important;
+    }
+    
+    &:hover {
+      background: rgba(59, 130, 246, 0.2) !important;
+      border-color: var(--p-blue-300) !important;
+      color: var(--p-blue-300) !important;
+      
+      .p-button-icon {
+        color: var(--p-blue-300) !important;
+      }
+      
+      .p-button-label {
+        color: var(--p-blue-300) !important;
+      }
+    }
+  }
+}
+
+// Icono y texto de editar (lápiz) - color mejorado en modo oscuro
+.card-actions ::ng-deep .p-button.p-button-text {
+  @media (prefers-color-scheme: dark) {
+    .p-button-icon.pi-pencil {
+      color: var(--p-primary-400) !important;
+    }
+    
+    .p-button-label {
+      color: var(--p-primary-400) !important;
+    }
+    
+    &:hover {
+      .p-button-icon.pi-pencil {
+        color: var(--p-primary-300) !important;
+      }
+      
+      .p-button-label {
+        color: var(--p-primary-300) !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .consultations-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .consultations-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .consultations-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-section h1 {
+    font-size: 1.75rem;
+  }
+}

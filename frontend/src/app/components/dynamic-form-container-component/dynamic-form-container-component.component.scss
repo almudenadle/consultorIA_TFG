@@ -1,0 +1,359 @@
+// === AURA TEME - PrimeNG Variables ===
+$border-radius: var(--p-border-radius);
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// === MULTISELECT LIST STYLES ===
+.multiselect-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.multiselect-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: $transition;
+  
+  i {
+    color: var(--p-primary-color);
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+  
+  span {
+    color: var(--p-text-color);
+    font-size: 0.9375rem;
+  }
+  
+  /* @media (prefers-color-scheme: dark) {
+    background-color: var(--p-surface-800);
+  } */
+}
+
+// === MAIN CONTAINER ===
+.dynamic-form-container {
+  width: 100%;
+  padding: 0 1rem;
+  background: var(--p-content-background);
+}
+
+// === SCROLL CONTAINER ===
+.forms-scroll-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+// === BASE CARD (for both form types) ===
+.form-card {
+  background: var(--p-card-background);
+  border: 1px solid var(--p-card-border-color);
+  border-radius: $border-radius;
+  box-shadow: var(--p-card-shadow);
+  transition: $transition;
+  overflow: visible;
+  scroll-margin-top: 2rem;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// === CARD HEADER ===
+.form-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--p-surface-100);
+  border-bottom: 1px solid var(--p-card-border-color);
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  @media (prefers-color-scheme: dark) {
+    background: var(--p-surface-800);
+  }
+
+  .header-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+}
+
+.form-badge {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--p-text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  
+  i {
+    font-size: 1rem;
+  }
+  
+  &.status-completed {
+    background: var(--p-green-100);
+    color: var(--p-green-700);
+    
+    i {
+      color: var(--p-green-600);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--p-green-400);
+      
+      i {
+        color: var(--p-green-400);
+      }
+    }
+  }
+  
+  &.status-active {
+    background: var(--p-primary-100);
+    color: var(--p-primary-600);
+    
+    i {
+      color: var(--p-primary-600);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--p-primary-400);
+      
+      i {
+        color: var(--p-primary-400);
+      }
+    }
+  }
+}
+
+// === AREA TAGS - Ajustes menores para tags de PrimeNG ===
+::ng-deep .header-badges .p-tag {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+// === CARD BODY ===
+.form-card-body {
+  padding: 1.5rem;
+  width: 100%;
+  background: var(--p-card-background);
+}
+
+// === SUBMITTED FORMS (READ-ONLY) ===
+.submitted-form {
+  opacity: 0.95;
+  
+  .form-field-readonly {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--p-surface-border);
+    
+    &:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+  }
+  
+  .field-label-readonly {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--p-text-muted-color);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    
+    .required-indicator {
+      color: var(--p-red-500);
+    }
+  }
+  
+  .field-value-readonly {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--p-text-color);
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-50);
+    border-radius: 6px;
+    border-left: 3px solid var(--p-primary-color);
+    line-height: 1.6;
+    word-wrap: break-word;
+    white-space: pre-line;
+    
+    @media (prefers-color-scheme: dark) {
+      background: var(--p-surface-800);
+    }
+  }
+}
+
+// === ACTIVE FORM ===
+.active-form {
+  border: 3px double var(--p-primary-color);
+  box-shadow: 
+    // Sombras de profundidad (oscuras)
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1),
+    
+    // Halo de luz exterior (difuminado)
+    0 0 0 3px var(--p-primary-100),        // Anillo interno sólido
+    0 0 12px 3px var(--p-primary-200),     // Brillo difuso medio
+    0 0 24px 6px var(--p-primary-300);  
+  
+  @media (prefers-color-scheme: dark) {
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 2px 4px -2px rgba(0, 0, 0, 0.2),
+
+      0 0 0 3px rgba(139, 92, 246, 0.3),      // Anillo interno
+      0 0 16px 4px rgba(139, 92, 246, 0.4),   // Brillo medio
+      0 0 32px 8px rgba(139, 92, 246, 0.2);
+  }
+  
+  .form-card-body {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+// === FORM ACTIONS ===
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--p-surface-border);
+  
+  ::ng-deep p-button button {
+    padding: 0.75rem 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    
+    // Estado deshabilitado: color morado apagado con texto blanco suave
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      color: rgba(255, 255, 255, 0.6) !important;
+      
+      .p-button-label {
+        color: rgba(255, 255, 255, 0.6) !important;
+      }
+      
+      .p-button-icon {
+        color: rgba(255, 255, 255, 0.6) !important;
+      }
+    }
+    
+    // Estado habilitado: color morado más intenso (como hover) con texto blanco
+    &:not(:disabled) {
+      background: var(--p-primary-600) !important;
+      border-color: var(--p-primary-600) !important;
+      color: #ffffff !important;
+      
+      .p-button-label {
+        color: #ffffff !important;
+      }
+      
+      .p-button-icon {
+        color: #ffffff !important;
+      }
+      
+      &:hover {
+        background: var(--p-primary-700) !important;
+        border-color: var(--p-primary-700) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        color: #ffffff !important;
+        
+        .p-button-label {
+          color: #ffffff !important;
+        }
+        
+        .p-button-icon {
+          color: #ffffff !important;
+        }
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+// === LOADING STATES ===
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
+  
+  p {
+    color: var(--p-text-muted-color);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+// === RESPONSIVE ===
+@media (max-width: 768px) {
+  .dynamic-form-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .forms-scroll-container {
+    gap: 1rem;
+  }
+  
+  .form-card-header {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    
+    .header-badges {
+      gap: 0.5rem;
+    }
+  }
+  
+  
+  .form-card-body {
+    padding: 1rem;
+  }
+  
+  .form-actions {
+    ::ng-deep p-button {
+      width: 100%;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+

@@ -1,0 +1,302 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* PrimeNG Styles */
+@import "primeicons/primeicons.css";
+
+/* ============================================================================
+   GLOBAL STYLES - Estilos base y configuraciones globales
+   ============================================================================ */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ============================================================================
+   BORDER RADIUS - Radio de borde consistente para componentes
+   ============================================================================ */
+
+.p-button,
+.custom-btn,
+.btn-cancel,
+.p-inputtext,
+.p-password input,
+.p-select,
+.p-textarea,
+.p-chip {
+  border-radius: 0.75rem;
+}
+
+.p-inputgroup .p-inputtext:first-child {
+  border-top-left-radius: 0.75rem;
+  border-bottom-left-radius: 0.75rem;
+}
+
+.p-inputgroup .p-inputtext:last-child {
+  border-top-right-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+}
+
+/* ============================================================================
+   LIGHT MODE - Estilos para modo claro
+   ============================================================================ */
+
+:root {
+  /* Fondos */
+  --app-background: linear-gradient(135deg, var(--p-primary-50) 0%, var(--p-sec2-50) 100%);
+  --app-page-background: var(--p-surface-0);
+
+  /* Tarjetas */
+  --app-card-background: var(--p-surface-0);
+  --app-card-border: var(--p-surface-200);
+
+  /* Textos */
+  --app-text-primary: var(--p-text-color);
+  --app-text-secondary: var(--p-text-muted-color);
+
+  /* Headers */
+  --app-header-background: var(--p-surface-0);
+  --app-header-text: var(--p-text-color);
+}
+
+/* Estilos base para modo claro */
+body,
+.app-container,
+.page-container {
+  background: var(--app-page-background);
+  color: var(--app-text-primary);
+}
+
+/* Tarjetas en modo claro */
+.p-card,
+::ng-deep .p-card {
+  background: var(--app-card-background);
+  border: 1px solid var(--app-card-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* Botones primarios - texto blanco (light y dark mode) */
+.p-button:not(.p-button-outlined):not(.p-button-text),
+::ng-deep .p-button:not(.p-button-outlined):not(.p-button-text) {
+  color: #ffffff !important;
+
+  .p-button-label {
+    color: #ffffff !important;
+  }
+
+  .p-button-icon {
+    color: #ffffff !important;
+  }
+
+  &:hover:not(:disabled) {
+    color: #ffffff !important;
+
+    .p-button-label {
+      color: #ffffff !important;
+    }
+
+    .p-button-icon {
+      color: #ffffff !important;
+    }
+  }
+}
+
+/* Botones outlined en modo claro */
+.p-button-outlined,
+::ng-deep .p-button-outlined {
+  border-color: var(--p-primary-500);
+  color: var(--p-primary-500);
+
+  &:hover:not(:disabled) {
+    background: var(--p-primary-50);
+    border-color: var(--p-primary-600);
+    color: var(--p-primary-600);
+  }
+}
+
+/* ============================================================================
+   DARK MODE - Estilos para modo oscuro
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Fondos modo oscuro */
+    --app-background: linear-gradient(135deg, rgb(18, 18, 24) 0%, rgb(25, 25, 35) 100%);
+    --app-page-background: rgb(18, 18, 24);
+
+    /* Tarjetas modo oscuro */
+    --app-card-background: rgb(30, 30, 42);
+    --app-card-border: rgb(45, 45, 65);
+
+    /* Textos modo oscuro */
+    --app-text-primary: rgb(240, 240, 245);
+    --app-text-secondary: rgb(170, 170, 185);
+
+    /* Headers modo oscuro */
+    --app-header-background: rgb(18, 18, 24);
+    --app-header-text: rgb(240, 240, 245);
+  }
+
+  /* Fondo de página en modo oscuro */
+  body,
+  .app-container,
+  .page-container {
+    background: var(--app-page-background);
+    color: var(--app-text-primary);
+  }
+
+  /* Tarjetas en modo oscuro */
+  .p-card,
+  ::ng-deep .p-card {
+    background: var(--app-card-background) !important;
+    border: 1px solid var(--app-card-border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      border-color: rgb(55, 55, 75);
+    }
+  }
+
+  /* Card Header en modo oscuro */
+  .p-card-header,
+  ::ng-deep .p-card-header {
+    background: rgb(35, 35, 50);
+    border-bottom: 1px solid var(--app-card-border);
+    color: var(--app-text-primary);
+  }
+
+  /* Card Body en modo oscuro */
+  .p-card-body,
+  ::ng-deep .p-card-body {
+    color: var(--app-text-primary);
+  }
+
+  /* Card Title en modo oscuro */
+  .p-card-title,
+  ::ng-deep .p-card-title {
+    color: var(--app-text-primary);
+  }
+
+  /* Card Subtitle y contenido en modo oscuro */
+  .p-card-subtitle,
+  .p-card-content,
+  ::ng-deep .p-card-subtitle,
+  ::ng-deep .p-card-content {
+    color: var(--app-text-secondary);
+  }
+
+  /* Botones primarios en modo oscuro - texto blanco */
+  .p-button:not(.p-button-outlined):not(.p-button-text),
+  ::ng-deep .p-button:not(.p-button-outlined):not(.p-button-text) {
+    color: #ffffff !important;
+
+    .p-button-label {
+      color: #ffffff !important;
+    }
+
+    .p-button-icon {
+      color: #ffffff !important;
+    }
+  }
+
+  /* Botones outlined en modo oscuro */
+  .p-button-outlined,
+  ::ng-deep .p-button-outlined {
+    border-color: var(--p-primary-400);
+    color: var(--p-primary-400);
+    background: transparent;
+
+    &:hover:not(:disabled) {
+      background: rgba(147, 112, 219, 0.1);
+      border-color: var(--p-primary-300);
+      color: var(--p-primary-300);
+    }
+
+    &:active:not(:disabled) {
+      background: rgba(147, 112, 219, 0.2);
+    }
+  }
+
+  /* Inputs en modo oscuro */
+  .p-inputtext,
+  .p-password input,
+  .p-select,
+  .p-textarea,
+  ::ng-deep .p-inputtext,
+  ::ng-deep .p-password input,
+  ::ng-deep .p-select,
+  ::ng-deep .p-textarea {
+    background: rgb(25, 25, 35);
+    border-color: var(--app-card-border);
+    color: var(--app-text-primary);
+
+    &:enabled:hover {
+      border-color: rgb(55, 55, 75);
+    }
+
+    &:enabled:focus {
+      border-color: var(--p-primary-400);
+      box-shadow: 0 0 0 0.2rem rgba(147, 112, 219, 0.25);
+    }
+  }
+
+  /* Menu y Dropdown en modo oscuro */
+  .p-menu,
+  .p-dropdown-panel,
+  ::ng-deep .p-menu,
+  ::ng-deep .p-dropdown-panel {
+    background: var(--app-card-background);
+    border: 1px solid var(--app-card-border);
+  }
+
+  .p-menuitem-link,
+  ::ng-deep .p-menuitem-link {
+    color: var(--app-text-primary);
+
+    &:hover {
+      background: rgb(40, 40, 55);
+    }
+  }
+
+  /* Dialog en modo oscuro */
+  .p-dialog,
+  ::ng-deep .p-dialog {
+    background: var(--app-card-background);
+    border: 1px solid var(--app-card-border);
+
+    .p-dialog-header {
+      background: rgb(35, 35, 50);
+      border-bottom: 1px solid var(--app-card-border);
+      color: var(--app-text-primary);
+    }
+
+    .p-dialog-content {
+      background: var(--app-card-background);
+      color: var(--app-text-primary);
+    }
+  }
+
+  /* Texto secundario global */
+  p,
+  span,
+  label,
+  .secondary-text {
+    color: var(--app-text-color);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--app-text-primary);
+  }
+}

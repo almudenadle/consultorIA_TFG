@@ -1,0 +1,79 @@
+<!--
+  Dynamic Form Question Component Template
+  
+  This component dynamically renders form fields based on configuration received from the backend.
+  Each field is rendered with the appropriate input control based on its type property.
+  
+  Supported field types:
+  - select: Dropdown selection from predefined options (PrimeNG Select)
+  - multiselect: Multiple selection from predefined options (PrimeNG MultiSelect with chips display)
+  - textarea: Multi-line text input for longer responses (PrimeNG Textarea with autoResize)
+  
+  Features:
+  - Automatic validation display when field is touched and invalid
+  - Required field indicator (asterisk)
+  - Consistent styling across all field types
+  - Accessibility support with proper label associations
+-->
+
+<div class="form-questions-container">
+  @for (field of fields(); track field.idField) {
+    <div class="form-field" [formGroup]="formGroup()" #formField>
+      <!-- Question label with required indicator -->
+      <label [for]="field.idField" class="field-label">
+        {{ field.question }}
+        @if (field.required) {
+          <span class="required-indicator">*</span>
+        }
+      </label>
+
+      <!-- Select dropdown -->
+      @if (field.type === "select") {
+        <p-select
+          [inputId]="field.idField"
+          [formControlName]="field.idField"
+          [options]="field.options || []"
+          [placeholder]="field.placeholder || 'Selecciona una opción'"
+        />
+      }
+
+      <!-- MultiSelect dropdown -->
+      @if (field.type === "multiselect") {
+        <p-multiSelect
+          #fieldElement
+          [inputId]="field.idField"
+          [formControlName]="field.idField"
+          [options]="field.options || []"
+          [placeholder]="field.placeholder || 'Selecciona una o más opciones'"
+          display="chip"
+          [filter]="false"
+          selectedItemsLabel="{0} opciones seleccionadas"
+        />
+      }
+
+      <!-- Textarea with autoresize. #textAreaField set label for the DOM
+           and enables use @ViewChildren values -->
+      @if (field.type === "textarea") {
+        <textarea
+          pTextarea
+          #textareaField
+          [id]="field.idField"
+          [formControlName]="field.idField"
+          [placeholder]="field.placeholder || 'Escribe tu respuesta...'"
+          [rows]="4"
+          [autoResize]="true"
+        ></textarea>
+      }
+
+      <!-- Validation errors -->
+      @if (
+        formGroup().get(field.idField)?.invalid &&
+        formGroup().get(field.idField)?.touched
+      ) {
+        <small class="error-message">
+          {{ getErrorMessage(field) }}
+        </small>
+      }
+    </div>
+  }
+</div>

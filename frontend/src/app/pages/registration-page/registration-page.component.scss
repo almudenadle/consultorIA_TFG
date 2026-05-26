@@ -1,0 +1,82 @@
+.registration-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--app-background);
+  font-family: var(--font-family);
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  // Animated background
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+  
+  // Dark theme support - adjust decorative elements
+  @media (prefers-color-scheme: dark) {
+    &::after {
+      background: radial-gradient(circle, rgba(170, 169, 214, 0.1) 0%, transparent 70%);
+    }
+  }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  50% { 
+    transform: translate(50px, 50px) scale(1.1);
+    opacity: 0.5;
+  }
+}
+
+.registration-container {
+  width: 100%;
+  max-width: 750px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  // Entrance animation
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .registration-container {
+    max-width: 100%;
+    padding: 1.5rem 0.75rem;
+  }
+}
+
+// Ajuste adicional para pantallas muy pequeñas
+@media (max-height: 700px) {
+  .registration-container {
+    padding: 1rem 0.5rem;
+    min-height: auto;
+  }
+}

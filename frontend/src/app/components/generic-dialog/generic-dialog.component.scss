@@ -1,0 +1,300 @@
+// ============================================================================
+// VARIABLES - Design tokens
+// ============================================================================
+$transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ============================================================================
+// GENERIC DIALOG - PrimeNG dialog overrides (requires ::ng-deep)
+// ============================================================================
+
+::ng-deep .p-dialog.generic-dialog,
+::ng-deep .p-dialog.consultation-title-dialog,
+::ng-deep .p-dialog.delete-confirmation-dialog {
+  border-radius: 20px;
+  overflow: hidden;
+
+  .p-dialog-header {
+    padding: 1.5rem 1.5rem 1.25rem;
+    background: linear-gradient(135deg, var(--p-primary-600) 0%, var(--p-sec1-600) 100%);
+    border-bottom: none;
+    position: relative;
+
+    .p-dialog-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .p-dialog-header-close {
+      color: rgba(255, 255, 255, 0.9) !important;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      transition: $transition-default;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+      }
+    }
+  }
+
+  .p-dialog-content {
+    padding: 1.75rem 1.5rem 1.5rem;
+    color: var(--p-text-color);
+  }
+
+  .p-dialog-footer {
+    padding: 1.25rem 1.5rem 1.75rem;
+    border-top: none;
+    color: var(--p-text-color);
+  }
+}
+
+// ============================================================================
+// DIALOG HEADER - Icon and title layout
+// ============================================================================
+
+.dialog-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.9);
+
+  .dialog-icon {
+    font-size: 1.75rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+// ============================================================================
+// DIALOG BODY - Content area with description, input, and warning
+// ============================================================================
+
+.dialog-body-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .dialog-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+    font-weight: 500;
+    color: var(--p-text-color);
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+
+    .field-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--p-text-color);
+      margin: 0;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .optional-badge {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--p-text-color);
+        opacity: 0.7;
+        padding: 0.15rem 0.5rem;
+        border-radius: 8px;
+        background: rgba(var(--p-primary-500-rgb, 99, 102, 241), 0.15);
+      }
+    }
+
+    .title-input {
+      width: 100%;
+      padding: 0.625rem 0.875rem;
+      font-size: 0.9375rem;
+      transition: $transition-default;
+      border: 2px solid var(--p-surface-300);
+
+      &:focus {
+        border-color: var(--p-primary-500);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+      }
+    }
+  }
+
+  .dialog-warning {
+    background: rgba(239, 68, 68, 0.1);
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border-left: 3px solid var(--p-red-500);
+    color: #ef4444;
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+}
+
+// ============================================================================
+// DIALOG FOOTER - Button container
+// ============================================================================
+
+.dialog-footer-content {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+// ============================================================================
+// BUTTON STYLES - PrimeNG button overrides (requires ::ng-deep)
+// ============================================================================
+
+// Primary button (Nueva Consultoría style)
+::ng-deep .p-button.btn-primary {
+  background: var(--p-primary-500) !important;
+  border-color: var(--p-primary-500) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 600;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.9375rem;
+  transition: $transition-default;
+  letter-spacing: 0.3px;
+
+  .p-button-label,
+  .p-button-icon {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  &:hover {
+    background: var(--p-primary-600) !important;
+    border-color: var(--p-primary-600) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+}
+
+// Secondary button (Cancelar)
+::ng-deep .p-button.p-button-secondary {
+  font-weight: 600;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+  transition: $transition-default;
+  letter-spacing: 0.3px;
+  margin-right: 0.75rem;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+// Danger button (Eliminar)
+::ng-deep .p-button.p-button-danger {
+  background: linear-gradient(135deg, var(--p-red-500) 0%, var(--p-red-600) 100%) !important;
+  border: none !important;
+  font-weight: 600;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+  transition: $transition-default;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin-left: 0.75rem;
+
+  .p-button-label,
+  .p-button-icon {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, var(--p-red-600) 0%, var(--p-red-700) 100%) !important;
+    transform: translateY(-3px);
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+// ============================================================================
+// RESPONSIVE DESIGN - Mobile adaptations
+// ============================================================================
+
+@media (max-width: 768px) {
+  ::ng-deep .p-dialog.generic-dialog,
+  ::ng-deep .p-dialog.consultation-title-dialog,
+  ::ng-deep .p-dialog.delete-confirmation-dialog {
+    border-radius: 16px;
+
+    .p-dialog-header {
+      padding: 1.25rem 1.25rem 1rem;
+    }
+
+    .p-dialog-content {
+      padding: 1.5rem 1.25rem 1.25rem;
+    }
+
+    .p-dialog-footer {
+      padding: 1rem 1.25rem 1.5rem;
+
+      .dialog-footer-content {
+        flex-direction: column;
+        gap: 1rem;
+
+        .p-button {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .dialog-header-content {
+    h3 {
+      font-size: 1.25rem;
+    }
+
+    .dialog-icon {
+      font-size: 1.5rem;
+    }
+  }
+
+  .dialog-body-content {
+    gap: 1.25rem;
+
+    .dialog-description {
+      font-size: 0.875rem;
+    }
+
+    .form-field {
+      .field-label {
+        font-size: 0.8125rem;
+      }
+
+      .title-input {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+      }
+    }
+  }
+}

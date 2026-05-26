@@ -1,0 +1,125 @@
+<div class="consultation-page-container">
+  <!-- Encabezado fijo -->
+  <header class="consultation-header-fixed">
+    <p-button
+      icon="pi pi-arrow-left"
+      styleClass="back-to-home-button"
+      [text]="true"
+      severity="secondary"
+      (onClick)="navigateToHome()"
+    ></p-button>
+
+    <div class="consultation-title-section">
+      <span
+        class="consultation-title"
+        [class.editable]="canEditTitle"
+        (click)="enableTitleEdit()"
+        *ngIf="!editingTitle"
+      >
+        {{ consultationTitle || "Consultoría sin título" }}
+        <i class="pi pi-pencil" *ngIf="canEditTitle"></i>
+      </span>
+      <input
+        *ngIf="editingTitle"
+        [(ngModel)]="editableTitle"
+        (blur)="saveTitleEdit()"
+        (keydown.enter)="saveTitleEdit()"
+        class="edit-title-input"
+        [disabled]="savingTitle"
+        maxlength="60"
+        autofocus
+      />
+    </div>
+
+    <p-avatar [label]="userInitials" shape="circle"></p-avatar>
+  </header>
+
+  <!-- Grid Layout: 3 columnas x 2 filas -->
+  <div class="consultation-grid-layout">
+    <!-- Columna izquierda - fila superior -->
+    <aside class="left-sidebar">
+      <div class="grid-area-left-top">
+        <app-consulting-index
+          [formIndexEntries]="formIndexEntries"
+          (formSelected)="onFormSelectedFromIndex($event)"
+        ></app-consulting-index>
+      </div>
+    </aside>
+
+    <!-- Columna central - formulario (ocupa 2 filas) -->
+    <div class="grid-area-center">
+      <app-dynamic-form-container
+        [consultingID]="consultingID"
+        [initialTitle]="consultationTitle"
+        (consultationDataUpdated)="onConsultationDataUpdated($event)"
+        (formIndexUpdated)="onFormIndexUpdate($event)"
+      ></app-dynamic-form-container>
+    </div>
+
+
+    <!-- Columna derecha -->
+    <aside class="right-sidebar">
+      <div class="grid-area-right-top">
+        <app-assistant-message
+          [message]="currentAssistantMessage"
+          [meanVelocity]="meanVelocity"
+          [areas]="allAreas"
+        ></app-assistant-message>
+      </div>
+
+      <div class="grid-area-right-middle">
+        <div class="progress-section">
+          <header class="progress-header">
+            <i class="pi pi-gauge"></i>
+            <h3 class="progress-title">Progreso</h3>
+          </header>
+          <div class="chart-wrapper half-doughnut">
+            <app-chart [chartId]="'overall-chart'" 
+              chartType="doughnut" 
+              [chartData]="overallChartData" 
+              [chartOptions]="overallChartOptions">
+            </app-chart>
+            <div class="chart-score-overlay gauge-score-overlay">
+              <span class="chart-score-value">{{ meanAreasScoreOrZero }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha - fila inferior (asistente) -->
+      <div class="grid-area-right-bottom">
+        <section class="kpi-charts-wrapper">
+          <header class="charts-header">
+            <i class="pi pi-chart-pie"></i>
+            <h3 class="charts-title">Áreas detectadas</h3>
+
+          </header>
+
+          <div class="charts-list">
+            <div
+              *ngFor="let area of areasWithCharts; trackBy: trackByAreaId"
+              class="kpi-chart-container"
+            >
+              <div class="chart-wrapper">
+                <app-chart
+                  [chartId]="'area-chart-' + area.id"
+                  chartType="doughnut"
+                  [chartData]="area.chartData"
+                  [chartOptions]="area.chartOptions"
+                ></app-chart>
+
+                <div class="chart-score-overlay">
+                  <span class="chart-score-value"
+                    >{{ area.actualScore * 10 }}%</span
+                  >
+                </div>
+              </div>
+
+              <h4 class="area-name">{{ area.name }}</h4>
+            </div>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </div>
+</div>

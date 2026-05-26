@@ -1,0 +1,296 @@
+<div class="registration-card">
+  <div class="header">
+    <p-button
+      icon="pi pi-arrow-left"
+      [text]="true"
+      [rounded]="true"
+      (onClick)="goBack()"
+      styleClass="back-button"
+      ariaLabel="Volver a la página principal"
+    ></p-button>
+    <h2>Registro de Usuario</h2>
+    <p>Completa tus datos para comenzar</p>
+  </div>
+
+  <form
+    [formGroup]="registrationForm"
+    (ngSubmit)="onSubmit()"
+    class="form-container"
+  >
+    <!-- Los mensajes de error y éxito ahora se muestran en el popup global -->
+
+    <!-- User Form Section -->
+    <div class="form-section">
+      <h3><i class="pi pi-user"></i> Datos de Usuario</h3>
+
+      <div class="form-row">
+        <div class="field">
+          <p-floatLabel variant="on">
+            <input
+              pInputText
+              id="name"
+              formControlName="name"
+              class="w-full"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  registrationForm.get('name')?.invalid &&
+                  registrationForm.get('name')?.touched,
+              }"
+            />
+            <label for="name">Nombre *</label>
+          </p-floatLabel>
+          <small
+            *ngIf="
+              registrationForm.get('name')?.invalid &&
+              registrationForm.get('name')?.touched
+            "
+            class="error-text"
+          >
+            El nombre es requerido
+          </small>
+        </div>
+
+        <div class="field">
+          <p-floatLabel variant="on">
+            <input
+              pInputText
+              id="lastName"
+              formControlName="lastName"
+              class="w-full"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  registrationForm.get('lastName')?.invalid &&
+                  registrationForm.get('lastName')?.touched,
+              }"
+            />
+            <label for="lastName">Apellido *</label>
+          </p-floatLabel>
+          <small
+            *ngIf="
+              registrationForm.get('lastName')?.invalid &&
+              registrationForm.get('lastName')?.touched
+            "
+            class="error-text"
+          >
+            El apellido es requerido
+          </small>
+        </div>
+      </div>
+
+      <div class="field">
+        <p-floatLabel variant="on">
+          <input
+            pInputText
+            id="userId"
+            formControlName="userId"
+            class="w-full"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                registrationForm.get('userId')?.invalid &&
+                registrationForm.get('userId')?.touched,
+            }"
+          />
+          <label for="userId">Usuario *</label>
+        </p-floatLabel>
+        <small
+          *ngIf="
+            registrationForm.get('userId')?.invalid &&
+            registrationForm.get('userId')?.touched
+          "
+          class="error-text"
+        >
+          El usuario es requerido
+        </small>
+      </div>
+
+      <div class="field">
+        <p-floatLabel variant="on">
+          <input
+            pInputText
+            id="mail"
+            formControlName="mail"
+            class="w-full"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                registrationForm.get('mail')?.invalid &&
+                registrationForm.get('mail')?.touched,
+            }"
+          />
+          <label for="mail">Correo Electrónico *</label>
+        </p-floatLabel>
+        <small
+          *ngIf="
+            registrationForm.get('mail')?.invalid &&
+            registrationForm.get('mail')?.touched
+          "
+          class="error-text"
+        >
+          Ingresa un correo válido
+        </small>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <p-floatLabel variant="on">
+            <p-password
+              id="password"
+              formControlName="password"
+              [feedback]="true"
+              [toggleMask]="true"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  registrationForm.get('password')?.invalid &&
+                  registrationForm.get('password')?.touched,
+              }"
+              autocomplete="new-password"
+            ></p-password>
+            <label for="password">Contraseña *</label>
+          </p-floatLabel>
+          <small
+            *ngIf="
+              registrationForm.get('password')?.invalid &&
+              registrationForm.get('password')?.touched
+            "
+            class="error-text"
+          >
+            Mínimo 8 caracteres
+          </small>
+        </div>
+
+        <div class="field">
+          <p-floatLabel variant="on">
+            <p-password
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              [feedback]="false"
+              [toggleMask]="true"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  registrationForm.hasError('passwordMismatch') &&
+                  registrationForm.get('confirmPassword')?.touched,
+              }"
+              autocomplete="new-password"
+            ></p-password>
+            <label for="confirmPassword">Confirmar Contraseña *</label>
+          </p-floatLabel>
+          <small
+            *ngIf="
+              registrationForm.hasError('passwordMismatch') &&
+              registrationForm.get('confirmPassword')?.touched
+            "
+            class="error-text"
+          >
+            Las contraseñas no coinciden
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company Form Section -->
+    <div class="form-section" [formGroup]="companyForm">
+      <h3><i class="pi pi-building"></i> Datos de Empresa</h3>
+
+      <div class="field">
+        <p-floatLabel variant="on">
+          <input
+            pInputText
+            id="companyName"
+            formControlName="name"
+            class="w-full"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                companyForm.get('name')?.invalid &&
+                companyForm.get('name')?.touched,
+            }"
+          />
+          <label for="companyName">Nombre de Empresa *</label>
+        </p-floatLabel>
+        <small
+          *ngIf="
+            companyForm.get('name')?.invalid && companyForm.get('name')?.touched
+          "
+          class="error-text"
+        >
+          El nombre de empresa es requerido
+        </small>
+      </div>
+
+      <div class="field">
+        <p-floatLabel variant="on">
+          <p-select
+            id="sector"
+            formControlName="sector"
+            [options]="companySectorOptions"
+            optionValue="value"
+            placeholder="Selecciona el sector"
+            styleClass="w-full"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                companyForm.get('sector')?.invalid &&
+                companyForm.get('sector')?.touched,
+            }"
+          />
+        </p-floatLabel>
+        <small
+          *ngIf="
+            companyForm.get('sector')?.invalid &&
+            companyForm.get('sector')?.touched
+          "
+          class="error-text"
+        >
+          El sector es requerido
+        </small>
+      </div>
+
+      <div class="field">
+        <p-floatLabel variant="on">
+          <p-select
+            id="size"
+            formControlName="size"
+            [options]="companySizeOptions"
+            optionValue="value"
+            styleClass="w-full"
+            placeholder="Seleccione el tamaño"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                companyForm.get('size')?.invalid &&
+                companyForm.get('size')?.touched,
+            }"
+          ></p-select>
+        </p-floatLabel>
+        <small
+          *ngIf="
+            companyForm.get('size')?.invalid && companyForm.get('size')?.touched
+          "
+          class="error-text"
+        >
+          El tamaño es requerido
+        </small>
+      </div>
+    </div>
+
+    <!-- Submit Buttons -->
+    <div class="button-container">
+      <p-button
+        label="Cancelar"
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="resetForm()"
+        [disabled]="loading"
+        styleClass="btn-cancel"
+      ></p-button>
+      <p-button
+        [label]="loading ? 'Registrando...' : 'Registrar'"
+        type="submit"
+        [loading]="loading"
+        [disabled]="registrationForm.invalid || companyForm.invalid"
+        styleClass="custom-btn"
+      ></p-button>
+    </div>
+  </form>
+</div>

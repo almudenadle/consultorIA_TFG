@@ -1,0 +1,86 @@
+@keyframes bubble-rise {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 -200px;
+  }
+}
+#container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: clamp(200px, 30vh, 350px);
+  max-height: clamp(250px, 40vh, 450px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+label {
+  position: relative;
+  display: block;
+  width: 70%;
+  max-width: 60px;
+  flex: 1;
+  max-height: 420px;
+  background: transparent;
+  border-radius: 0.4rem;
+  border: 2px solid white;
+  overflow: hidden;
+  box-shadow: 0 -2px 8px 0 rgba(white, 0.6);
+  div {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(to top, #4A9CC0 0%, #6BB5D8 50%, #A3E2EF 100%);
+    width: 100%;
+    height: 0%;
+    transition: height 0.5s ease-in-out;
+    box-shadow: 0 0 8px 1px white inset;
+    &:before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/172299/bubbles-mask.gif);
+      background-size: cover;
+      mix-blend-mode: overlay;
+      opacity: 0.8;
+      animation: bubble-rise 8s linear infinite;
+    }
+    &:after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 20px;
+      position: absolute;
+      top: -10px;
+      left: 0;
+      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+      filter: blur(3px);
+    }
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  label {
+    border: 2px solid #4A9CC0;
+    box-shadow: 0 -2px 8px 0 rgba(rgb(12, 35, 97), 0.2);
+  }
+
+}
+#avance {
+  display: block;
+  color: #4F9CC0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+  width: 100%;
+  margin-top: 0.7rem;
+}

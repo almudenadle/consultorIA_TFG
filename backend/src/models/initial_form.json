@@ -1,0 +1,83 @@
+{
+  "questions": [
+    {
+      "idField": "area_problema",
+      "question": "¿En qué área se encuentra el problema?",
+      "placeholder": "Selecciona el área del problema",
+      "type": "select",
+      "required": true,
+      "options": [
+        "Crecimiento y Ventas",
+        "Operaciones y Eficiencia",
+        "Talento y Cultura",
+        "Producto y Tecnología",
+        "Finanzas y Legal"
+      ],
+      "isAnswered": false,
+      "response": ""
+    },
+    {
+      "idField": "seleccion_especifica",
+      "question": "Selección Específica",
+      "placeholder": "Selecciona el área específica",
+      "type": "select",
+      "required": true,
+      "options": [
+        [
+          "Adquisición de clientes (Leads)",
+          "Tasa de conversión y cierre",
+          "Retención y fidelización (Churn)",
+          "Estrategia de precios (Pricing)"
+        ],
+        [
+          "Cadena de suministro y logística",
+          "Automatización de procesos",
+          "Control de calidad",
+          "Reducción de costes operativos"
+        ],
+        [
+          "Reclutamiento y selección",
+          "Clima laboral y cultura",
+          "Retención de talento clave",
+          "Evaluación del desempeño"
+        ],
+        [
+          "Deuda técnica y bugs",
+          "Experiencia de usuario (UX/UI)",
+          "Roadmap y priorización",
+          "Escalabilidad de infraestructura"
+        ],
+        [
+          "Gestión del flujo de caja (Cash flow)",
+          "Cumplimiento legal y normativo",
+          "Planificación fiscal",
+          "Búsqueda de financiación/Inversión"
+        ]
+      ],
+      "isAnswered": false,
+      "response": ""
+    },
+    {
+      "idField": "descripcion_problema",
+      "question": "Describe el problema que ocurre en el área seleccionada",
+      "placeholder": "Ej: No vendemos porque el ordenador va lento",
+      "type": "textarea",
+      "required": true,
+      "options": null,
+      "isAnswered": false,
+      "response": "",
+      "validators": [
+        {
+          "type": "minLength",
+          "value": 100,
+          "message": "La descripción debe tener como mínimo 100 caracteres"
+        },
+        {
+          "type": "maxLength",
+          "value": 2000,
+          "message": "La descripción no puede superar los 2000 caracteres"
+        }
+      ]
+    }
+  ]
+}

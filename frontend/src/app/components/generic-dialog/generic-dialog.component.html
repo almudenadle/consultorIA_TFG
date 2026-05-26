@@ -1,0 +1,64 @@
+<p-dialog
+  [(visible)]="visible"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  [breakpoints]="{ '768px': '90vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [styleClass]="styleClass"
+  (onHide)="handleHide()"
+>
+  <ng-template #header>
+    <div class="dialog-header-content">
+      <i [class]="icon + ' dialog-icon'"></i>
+      <h3>{{ title }}</h3>
+    </div>
+  </ng-template>
+
+  <div class="dialog-body-content">
+    <p class="dialog-description" [innerHTML]="description"></p>
+
+    @if (showInput) {
+      <div class="form-field">
+        <label [for]="'dialog-input-' + title" class="field-label">
+          {{ inputLabel }}
+          @if (inputOptional) {
+            <span class="optional-badge">(opcional)</span>
+          }
+        </label>
+        <input
+          pInputText
+          [id]="'dialog-input-' + title"
+          [(ngModel)]="inputValue"
+          (ngModelChange)="onInputChange($event)"
+          (keydown.enter)="onInputEnter($event)"
+          [placeholder]="inputPlaceholder"
+          class="title-input"
+          [disabled]="inputDisabled"
+        />
+      </div>
+    }
+
+    @if (warningMessage) {
+      <p class="dialog-warning">
+        {{ warningMessage }}
+      </p>
+    }
+  </div>
+
+  <ng-template #footer>
+    <div class="dialog-footer-content">
+      @for (button of buttons; track $index) {
+        <p-button
+          [label]="button.label"
+          [icon]="button.icon"
+          [styleClass]="button.styleClass"
+          [loading]="button.loading || false"
+          [disabled]="button.disabled || false"
+          (onClick)="onButtonClick(button)"
+        />
+      }
+    </div>
+  </ng-template>
+</p-dialog>

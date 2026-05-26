@@ -1,0 +1,928 @@
+
+// ============================================================================
+// VARIABLES - Tokens de diseño para consistencia visual
+// ============================================================================
+$transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$border-radius-lg: 1.5rem;
+$border-radius-md: 1rem;
+$border-radius-sm: 0.75rem;
+
+// ============================================================================
+// LAYOUT PRINCIPAL - Contenedor de la página de perfil
+// ============================================================================
+
+:host {
+  display: block;
+}
+
+.profile-container {
+  min-height: 100vh;
+  background: var(--app-page-background);
+}
+
+// ============================================================================
+// LOADING STATE - Estado de carga centrado
+// ============================================================================
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1rem;
+  
+  p {
+    color: #64748b;
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .loading-state {
+    p {
+      color: #94a3b8;
+    }
+  }
+}
+
+// ============================================================================
+// HEADER - Título y navegación de la página
+// ============================================================================
+
+.profile-header {
+  background: var(--app-header-background);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  .header-content {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .back-button {
+    color: var(--app-header-text) !important;
+    font-size: 1.25rem;
+    transition: $transition-default;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      transform: translateX(-4px);
+    }
+  }
+  
+  .header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .header-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--app-header-text) !important;
+    margin: 0;
+    line-height: 1.2;
+  }
+}
+
+// ============================================================================
+// CONTENIDO PRINCIPAL - Grid de formularios
+// ============================================================================
+
+.profile-content {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+}
+
+.forms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr));
+  gap: 2rem;
+}
+
+// ============================================================================
+// TARJETA DE INFORMACIÓN - Card para user y company
+// ============================================================================
+
+.info-card {
+  background: var(--app-card-background);
+  border: 1px solid var(--app-card-border);
+  border-radius: $border-radius-lg;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: $transition-default;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-header {
+    border-bottom: 1px solid #374151;
+  }
+}
+
+.header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: $border-radius-sm;
+  font-size: 1.5rem;
+  
+  &.user-icon {
+    background: rgba(124, 58, 237, 0.1);
+    color: var(--p-primary-500);
+  }
+  
+  &.company-icon {
+    background: rgba(147, 51, 234, 0.1);
+    color: var(--p-sec1-500);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .header-icon {
+    &.user-icon {
+      background: rgba(124, 58, 237, 0.25);
+      color: var(--p-primary-300);
+    }
+    
+    &.company-icon {
+      background: rgba(147, 51, 234, 0.25);
+      color: var(--p-sec1-300);
+    }
+  }
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--app-text-primary);
+  margin: 0;
+}
+
+// ============================================================================
+// FORMULARIOS - Estilos para los campos y validación
+// ============================================================================
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.field-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--app-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: $border-radius-sm;
+  font-size: 1rem;
+  transition: $transition-default;
+  
+  &::placeholder {
+    color: var(--p-text-muted-color);
+    opacity: 0.6;
+  }
+  
+  &.with-icon {
+    padding-left: 2.75rem;
+  }
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--app-text-secondary);
+    font-size: 1.125rem;
+    z-index: 1;
+  }
+}
+
+// ============================================================================
+// SECCIÓN DE CONTRASEÑA - Área especial para cambiar contraseña
+// ============================================================================
+
+.password-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(124, 58, 237, 0.05);
+  padding: 1rem 1.25rem;
+  border-radius: $border-radius-md;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  margin-top: 1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .password-section {
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+  }
+}
+
+::ng-deep .change-password-btn {
+  font-weight: 500;
+  color: var(--p-primary-700) !important;
+  background: transparent !important;
+  
+  .p-button-label {
+    color: var(--p-primary-700) !important;
+  }
+  
+  &:hover:not(:disabled) {
+    background: transparent !important;
+    color: var(--p-primary-800) !important;
+    
+    .p-button-label {
+      color: var(--p-primary-800) !important;
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  ::ng-deep .change-password-btn {
+    color: var(--p-primary-400) !important;
+    background: transparent !important;
+    
+    .p-button-label {
+      color: var(--p-primary-400) !important;
+    }
+    
+    &:hover:not(:disabled) {
+      background: transparent !important;
+      color: var(--p-primary-300) !important;
+      
+      .p-button-label {
+        color: var(--p-primary-300) !important;
+      }
+    }
+  }
+}
+
+.password-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.password-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #ffffff;
+  border-radius: $border-radius-sm;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  
+  i {
+    color: var(--p-primary-500);
+    font-size: 1.125rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .password-icon-wrapper {
+    background: rgba(124, 58, 237, 0.2);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    
+    i {
+      color: #a78bfa;
+    }
+  }
+}
+
+.password-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.password-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--p-primary-700);
+}
+
+.password-hint {
+  font-size: 0.75rem;
+  color: var(--p-primary-600);
+}
+
+@media (prefers-color-scheme: dark) {
+  .password-label {
+    color: #c4b5fd;
+  }
+  
+  .password-hint {
+    color: #c4b5fd;
+    opacity: 0.8;
+  }
+}
+
+// ============================================================================
+// BANNER INFORMATIVO - Información del plan
+// ============================================================================
+
+.info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(124, 58, 237, 0.05);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: $border-radius-md;
+  margin-top: 1rem;
+  
+  .banner-icon {
+    color: var(--p-primary-500);
+    font-size: 1.25rem;
+    margin-top: 0.125rem;
+  }
+  
+  .banner-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .banner-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--p-primary-700);
+    margin: 0;
+  }
+  
+  .banner-text {
+    font-size: 0.875rem;
+    color: var(--p-primary-600);
+    opacity: 0.8;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .info-banner {
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    
+    .banner-icon {
+      color: #a78bfa;
+    }
+    
+    .banner-title {
+      color: #c4b5fd;
+    }
+    
+    .banner-text {
+      color: #c4b5fd;
+      opacity: 0.9;
+    }
+  }
+}
+
+// ============================================================================
+// ACCIONES UNIFICADAS - Botones de guardar/cancelar al final
+// ============================================================================
+
+.unified-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .unified-form-actions {
+    border-top: 1px solid #374151;
+  }
+}
+
+// ============================================================================
+// ACCIONES DE FORMULARIO - Botones de guardar/cancelar
+// ============================================================================
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .form-actions {
+    border-top: 1px solid #374151;
+  }
+}
+
+::ng-deep .cancel-btn {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: $transition-default;
+}
+
+::ng-deep .save-btn {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: $transition-default;
+  background: var(--p-primary-500) !important;
+  border-color: var(--p-primary-500) !important;
+  color: #ffffff !important;
+  
+  .p-button-label {
+    color: #ffffff !important;
+  }
+  
+  .p-button-icon {
+    color: #ffffff !important;
+  }
+  
+  &:hover:not(:disabled) {
+    background: var(--p-primary-600) !important;
+    border-color: var(--p-primary-600) !important;
+    color: #ffffff !important;
+    
+    .p-button-label {
+      color: #ffffff !important;
+    }
+    
+    .p-button-icon {
+      color: #ffffff !important;
+    }
+  }
+}
+
+// Asegurar estilos correctos en modo oscuro
+@media (prefers-color-scheme: dark) {
+  ::ng-deep .cancel-btn {
+    border-color: var(--p-primary-400) !important;
+    color: #ffffff !important;
+    background: transparent !important;
+    
+    .p-button-label {
+      color: #ffffff !important;
+    }
+    
+    &:hover:not(:disabled) {
+      background: rgba(147, 112, 219, 0.1) !important;
+      border-color: var(--p-primary-300) !important;
+      color: #ffffff !important;
+      
+      .p-button-label {
+        color: #ffffff !important;
+      }
+    }
+  }
+  
+  ::ng-deep .save-btn {
+    background: var(--p-primary-500) !important;
+    border-color: var(--p-primary-500) !important;
+    color: #ffffff !important;
+    
+    .p-button-label {
+      color: #ffffff !important;
+    }
+    
+    .p-button-icon {
+      color: #ffffff !important;
+    }
+    
+    &:hover:not(:disabled) {
+      background: var(--p-primary-600) !important;
+      border-color: var(--p-primary-600) !important;
+      color: #ffffff !important;
+      
+      .p-button-label {
+        color: #ffffff !important;
+      }
+      
+      .p-button-icon {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// DIÁLOGO DE CONTRASEÑA - Modal para cambiar contraseña
+// ============================================================================
+
+// Estilo global para el diálogo de contraseña - elimina los "piquitos"
+::ng-deep .p-dialog.password-dialog {
+  border-radius: 1rem !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .password-dialog {
+  // Aplicar border-radius al contenedor principal del diálogo
+  .p-dialog {
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+  
+  .p-dialog-header {
+    background: var(--app-card-background);
+    border-bottom: 1px solid var(--app-card-border);
+    padding: 1.5rem;
+    border-radius: 1rem 1rem 0 0;
+    
+    .p-dialog-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--app-text-primary) !important;
+    }
+  }
+  
+  .p-dialog-content {
+    padding: 2rem 1.5rem;
+  }
+  
+  .p-dialog-footer {
+    border-top: 1px solid var(--app-card-border);
+    padding: 1rem 1.5rem;
+    border-radius: 0 0 1rem 1rem;
+  }
+}
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+::ng-deep .dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  width: 100%;
+  
+  button {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+  
+  .p-button-outlined {
+    color: #ffffff !important;
+    
+    .p-button-label {
+      color: #ffffff !important;
+    }
+  }
+  
+  .p-button-primary {
+    background: var(--p-primary-500) !important;
+    border-color: var(--p-primary-500) !important;
+    color: #ffffff !important;
+    
+    .p-button-label {
+      color: #ffffff !important;
+    }
+    
+    .p-button-icon {
+      color: #ffffff !important;
+    }
+    
+    &:hover:not(:disabled) {
+      background: var(--p-primary-600) !important;
+      border-color: var(--p-primary-600) !important;
+      color: #ffffff !important;
+      
+      .p-button-label {
+        color: #ffffff !important;
+      }
+      
+      .p-button-icon {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+// Estilos para modo oscuro del modal
+@media (prefers-color-scheme: dark) {
+  ::ng-deep .dialog-actions {
+    .p-button-outlined {
+      border-color: var(--p-primary-400) !important;
+      color: #ffffff !important;
+      background: transparent !important;
+      
+      .p-button-label {
+        color: #ffffff !important;
+      }
+      
+      &:hover:not(:disabled) {
+        background: rgba(147, 112, 219, 0.1) !important;
+        border-color: var(--p-primary-300) !important;
+        color: #ffffff !important;
+        
+        .p-button-label {
+          color: #ffffff !important;
+        }
+      }
+    }
+    
+    .p-button-primary {
+      background: var(--p-primary-500) !important;
+      border-color: var(--p-primary-500) !important;
+      color: #ffffff !important;
+      
+      .p-button-label {
+        color: #ffffff !important;
+      }
+      
+      .p-button-icon {
+        color: #ffffff !important;
+      }
+      
+      &:hover:not(:disabled) {
+        background: var(--p-primary-600) !important;
+        border-color: var(--p-primary-600) !important;
+        color: #ffffff !important;
+        
+        .p-button-label {
+          color: #ffffff !important;
+        }
+        
+        .p-button-icon {
+          color: #ffffff !important;
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// ESTILOS GLOBALES DE PRIMENG - Ajustes para componentes PrimeNG
+// ============================================================================
+
+// Posición del toast - Bottom center (fuera de ::ng-deep para no interferir con estilos internos)
+:host ::ng-deep .p-toast {
+  top: auto !important;
+  bottom: 2rem !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  
+  &.p-toast-top-right {
+    top: auto !important;
+    bottom: 2rem !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+  }
+}
+
+::ng-deep {
+  // Estilos para p-select (dropdown)
+  .p-select {
+    width: 100%;
+    
+    .p-select-label {
+      padding: 0.75rem 1rem;
+    }
+    
+    &.p-invalid {
+      border-color: var(--p-red-500);
+    }
+    
+    // Light mode hover/focus
+    &:hover {
+      border-color: rgba(124, 58, 237, 0.5);
+    }
+    
+    &:focus-within {
+      border-color: var(--p-primary-500);
+      box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.2);
+    }
+  }
+  
+  // Input text light mode hover/focus
+  .p-inputtext {
+    &:hover {
+      border-color: rgba(124, 58, 237, 0.5);
+    }
+    
+    &:focus {
+      border-color: var(--p-primary-500);
+      box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.2);
+    }
+  }
+  
+  // Dark mode support para selects e inputs
+  @media (prefers-color-scheme: dark) {
+    .p-select {
+      background: var(--p-surface-800);
+      border-color: var(--p-surface-700);
+      color: var(--p-surface-0);
+      
+      .p-select-label {
+        color: var(--p-surface-0);
+      }
+      
+      &:hover {
+        border-color: rgba(124, 58, 237, 0.7);
+      }
+      
+      &:focus-within {
+        border-color: var(--p-primary-400);
+        box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.3);
+      }
+    }
+    
+    .p-inputtext {
+      background: var(--p-surface-800);
+      border-color: var(--p-surface-700);
+      color: var(--p-surface-0);
+      
+      &:hover {
+        border-color: rgba(124, 58, 237, 0.7);
+      }
+      
+      &:focus {
+        border-color: var(--p-primary-400);
+        box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.3);
+      }
+    }
+  }
+  
+  // Estilos para p-password
+  .p-password {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      padding-right: 3rem;
+    }
+  }
+  
+  // Alinear icono de toggle (ojito) al centro verticalmente
+  .p-password-toggle-button {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    right: 0.5rem !important;
+    height: 2rem !important;
+    width: 2rem !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  // Estilos para mensajes de error
+  .p-error {
+    color: var(--p-red-500);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  // Estilos para inputs inválidos
+  .p-invalid {
+    border-color: var(--p-red-500) !important;
+    
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.2);
+    }
+  }
+
+
+// ============================================================================
+// RESPONSIVE DESIGN - Adaptaciones para diferentes tamaños de pantalla
+// ============================================================================
+
+@media (max-width: 768px) {
+  .profile-header {
+    .header-content {
+      padding: 0 1rem;
+    }
+    
+    .header-title {
+      font-size: 1.5rem;
+    }
+    
+    .header-subtitle {
+      font-size: 0.875rem;
+    }
+  }
+  
+  .profile-content {
+    padding: 1.5rem 1rem;
+  }
+  
+  .forms-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .info-card {
+    padding: 1.5rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+    
+    button {
+      width: 100%;
+    }
+  }
+  
+  .password-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    
+    .change-password-btn {
+      align-self: flex-end;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .header-left {
+    gap: 1rem !important;
+  }
+  
+  .header-title {
+    font-size: 1.25rem !important;
+  }
+  
+  .header-subtitle {
+    font-size: 0.8125rem !important;
+  }
+  
+  .card-title {
+    font-size: 1.125rem;
+  }
+}
+}

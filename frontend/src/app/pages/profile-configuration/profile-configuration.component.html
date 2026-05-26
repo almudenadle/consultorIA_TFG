@@ -1,0 +1,319 @@
+<div class="profile-container">
+  <!-- Toast notifications for user feedback -->
+  <p-toast position="top-right" />
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-state">
+      <p-progressSpinner />
+      <p>Cargando información del perfil...</p>
+    </div>
+  }
+
+  <!-- Main Content -->
+  @else {
+    <!-- Header Section -->
+    <header class="profile-header">
+      <div class="header-content">
+        <div class="header-left">
+          <button
+            pButton
+            icon="pi pi-arrow-left"
+            class="p-button-text p-button-rounded back-button"
+            (click)="goBack()"
+            pTooltip="Volver al inicio"
+            tooltipPosition="bottom"
+          ></button>
+          <div class="header-text">
+            <h1 class="header-title">Configuración de Perfil</h1>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Profile Forms Grid -->
+    <main class="profile-content">
+      <div class="forms-grid">
+        <!-- User Information Card -->
+        <div class="info-card user-card">
+          <div class="card-header">
+            <div class="header-icon user-icon">
+              <i class="pi pi-user"></i>
+            </div>
+            <h2 class="card-title">Información Personal</h2>
+          </div>
+
+          <form [formGroup]="userForm" class="profile-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="firstName" class="field-label">Nombre</label>
+                <input
+                  pInputText
+                  id="firstName"
+                  formControlName="name"
+                  class="form-input"
+                  [class.p-invalid]="
+                    userForm.get('name')?.invalid &&
+                    userForm.get('name')?.touched
+                  "
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="lastName" class="field-label">Apellido</label>
+                <input
+                  pInputText
+                  id="lastName"
+                  formControlName="lastName"
+                  class="form-input"
+                  [class.p-invalid]="
+                    userForm.get('lastName')?.invalid &&
+                    userForm.get('lastName')?.touched
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label for="userName" class="field-label">Usuario</label>
+                <div class="input-with-icon">
+                  <i class="pi pi-user input-icon"></i>
+                  <input
+                    pInputText
+                    id="userName"
+                    formControlName="userName"
+                    class="form-input with-icon"
+                    [class.p-invalid]="
+                      userForm.get('userName')?.invalid &&
+                      userForm.get('userName')?.touched
+                    "
+                  />
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="email" class="field-label"
+                  >Correo Electrónico</label
+                >
+                <div class="input-with-icon">
+                  <i class="pi pi-envelope input-icon"></i>
+                  <input
+                    pInputText
+                    id="email"
+                    formControlName="mail"
+                    class="form-input with-icon"
+                    [class.p-invalid]="
+                      userForm.get('mail')?.invalid &&
+                      userForm.get('mail')?.touched
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="password-section">
+              <div class="password-info">
+                <div class="password-icon-wrapper">
+                  <i class="pi pi-lock"></i>
+                </div>
+                <div class="password-text">
+                  <span class="password-label">Contraseña</span>
+                  <span class="password-hint">Mantén tu cuenta segura</span>
+                </div>
+              </div>
+              <button
+                pButton
+                label="Cambiar"
+                class="p-button-text change-password-btn"
+                type="button"
+                (click)="openPasswordDialog()"
+              ></button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Company Information Card -->
+        <div class="info-card company-card">
+          <div class="card-header">
+            <div class="header-icon company-icon">
+              <i class="pi pi-building"></i>
+            </div>
+            <h2 class="card-title">Información de la Empresa</h2>
+          </div>
+
+          <form [formGroup]="companyForm" class="profile-form">
+            <div class="form-field full-width">
+              <label for="companyName" class="field-label"
+                >Nombre de la Empresa</label
+              >
+              <input
+                pInputText
+                id="companyName"
+                formControlName="name"
+                class="form-input"
+                [class.p-invalid]="
+                  companyForm.get('name')?.invalid &&
+                  companyForm.get('name')?.touched
+                "
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label for="companySize" class="field-label">Tamaño</label>
+                <p-select
+                  id="companySize"
+                  formControlName="size"
+                  [options]="companySizeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Selecciona el tamaño"
+                  styleClass="w-full"
+                  [class.p-invalid]="
+                    companyForm.get('size')?.invalid &&
+                    companyForm.get('size')?.touched
+                  "
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="sector" class="field-label">Sector</label>
+                <p-select
+                  id="sector"
+                  formControlName="sector"
+                  [options]="companySectorOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Selecciona el sector"
+                  styleClass="w-full"
+                  [class.p-invalid]="
+                    companyForm.get('sector')?.invalid &&
+                    companyForm.get('sector')?.touched
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="info-banner">
+              <i class="pi pi-info-circle banner-icon"></i>
+              <div class="banner-content">
+                <p class="banner-title">Tipo de Suscripción</p>
+                <p class="banner-text">
+                  Texto de prueba donde se podría indicar el tipo de suscripción
+                  que tiene el usuario.
+                </p>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Unified Form Actions -->
+      <div class="unified-form-actions">
+        <button
+          pButton
+          label="Cancelar"
+          class="p-button-outlined cancel-btn"
+          type="button"
+          (click)="cancelAllChanges()"
+          [disabled]="savingUser || savingCompany"
+        ></button>
+        <button
+          pButton
+          label="Guardar Cambios"
+          class="save-btn"
+          type="button"
+          (click)="saveAllChanges()"
+          [loading]="savingUser || savingCompany"
+          [disabled]="userForm.invalid || companyForm.invalid"
+        ></button>
+      </div>
+    </main>
+  }
+</div>
+
+<!-- Password Change Dialog -->
+<p-dialog
+  [(visible)]="showPasswordDialog"
+  [modal]="true"
+  [style]="{ width: '26rem' }"
+  [breakpoints]="{ '768px': '90vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="password-dialog"
+  header="Cambiar Contraseña"
+>
+  <form [formGroup]="passwordForm" class="password-form">
+    <div class="form-field">
+      <label for="oldPassword" class="field-label">Contraseña Actual</label>
+      <p-password
+        id="oldPassword"
+        formControlName="oldPassword"
+        [feedback]="false"
+        [toggleMask]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+        placeholder="Ingresa tu contraseña actual"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="newPassword" class="field-label">Nueva Contraseña</label>
+      <p-password
+        id="newPassword"
+        formControlName="newPassword"
+        [toggleMask]="true"
+        [feedback]="true"
+        [promptLabel]="passwordLabels.promptLabel"
+        [weakLabel]="passwordLabels.weakLabel"
+        [mediumLabel]="passwordLabels.mediumLabel"
+        [strongLabel]="passwordLabels.strongLabel"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+        placeholder="Ingresa tu nueva contraseña"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="confirmPassword" class="field-label"
+        >Confirmar Nueva Contraseña</label
+      >
+      <p-password
+        id="confirmPassword"
+        formControlName="confirmPassword"
+        [feedback]="false"
+        [toggleMask]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+        placeholder="Confirma tu nueva contraseña"
+      />
+      @if (
+        passwordForm.hasError("passwordMismatch") &&
+        passwordForm.get("confirmPassword")?.touched
+      ) {
+        <small class="p-error">Las contraseñas no coinciden</small>
+      }
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <div class="dialog-actions">
+      <button
+        pButton
+        label="Cancelar"
+        class="p-button-outlined"
+        (click)="closePasswordDialog()"
+        [disabled]="changingPassword"
+      ></button>
+      <button
+        pButton
+        label="Cambiar Contraseña"
+        class="p-button-primary"
+        (click)="submitPasswordChange()"
+        [loading]="changingPassword"
+        [disabled]="passwordForm.invalid"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
