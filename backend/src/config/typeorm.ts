@@ -6,7 +6,7 @@ import configEnv from "./config"
 dotenv.config();
 
 export const DB = new DataSource({
-    type: "mysql",
+    type: "postgres",
     host: configEnv.db.host,
     port: configEnv.db.port,
     username: configEnv.db.user,
