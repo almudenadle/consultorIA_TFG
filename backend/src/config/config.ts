@@ -3,9 +3,7 @@ import Joi from "joi";
 
 // We load the environment variables from the .env file.
 const config = dotenv.config();
-if (config.error) {
-  throw new Error(config.error.message);
-}
+
 
 // We validate environment variables with Joi
 const envSchema = Joi.object({
