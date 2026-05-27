@@ -512,7 +512,7 @@ Output Format: You must strictly follow the JSON Schema provided in the API requ
     // Calculate initial meanVelocity as average of initial scores
     const initialVelocity =
       savedAreas.length > 0
-        ? savedAreas.reduce((sum, area) => sum + area.actualScore, 0) /
+        ? savedAreas.reduce((sum, area: any) => sum + area.actualScore, 0) /
           savedAreas.length
         : 0;
 
@@ -706,10 +706,10 @@ Output Format: You must strictly follow the JSON Schema provided in the API requ
         order: { lastTimeAccessed: "DESC" },
       });
 
-      return consultings.map((consulting) => {
+      return consultings.map((consulting: any) => {
         const areas = consulting.areas ?? [];
         const averageScore = areas.length
-          ? (areas.reduce((sum, area) => sum + area.actualScore, 0) /
+          ? (areas.reduce((sum: number, area: any) => sum + area.actualScore, 0) /
               areas.length) *
             10
           : 0;

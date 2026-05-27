@@ -118,7 +118,7 @@ export class FormParser {
     console.log("\nAREAS DETECTADAS:");
     console.log("-".repeat(80));
 
-    consulting.areas.forEach((area, index) => {
+    consulting.areas.forEach((area: any, index: number) => {
       const statusLabel =
         area.status === StatusArea.COMPLETED
           ? "COMPLETED"
@@ -157,7 +157,7 @@ export class FormParser {
 
     // Get the current area in progress to assign to the new form
     const currentArea = consulting.areas.find(
-      (area) => area.status === StatusArea.IN_PROGRESS,
+      (area:any) => area.status === StatusArea.IN_PROGRESS,
     );
 
     const newForm = this.formRepo.create({
@@ -323,7 +323,7 @@ export class FormParser {
         throw new Error("Form not found");
       }
 
-      const updatedFields = form.fields.map((field) => {
+      const updatedFields = form.fields.map((field: any) => {
         const userResponse = data.responses?.find(
           (resp) => resp.idField === field.idField,
         );
