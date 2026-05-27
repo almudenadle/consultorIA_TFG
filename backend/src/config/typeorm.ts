@@ -12,8 +12,7 @@ export const DB = new DataSource({
     username: configEnv.db.user,
     password: configEnv.db.password,
     database: configEnv.db.name,
-    entities: [path.join(__dirname, "../entities/**/*.ts")],
-    synchronize: true,
+    entities: [path.join(__dirname, '../**/entities/*.entity.{ts,js}')],    synchronize: true,
 });
 
 export const initOrm = async () => {
