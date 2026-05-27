@@ -25,6 +25,8 @@ export default class Server {
     ],
   };
 
+  
+
   constructor() {
     this.app = express();
     this.port = config.PORT;
@@ -32,7 +34,8 @@ export default class Server {
     // Middlewares básicos
     this.app.use(express.json({ limit: "50mb" })); // Enviar json - aumentado para PDFs grandes
     this.app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-    this.app.use(cors(this.corsOptions));
+  //  this.app.use(cors(this.corsOptions));
+    this.app.use(cors({ origin: '*' }));  //en una produccion real no hariamos esto
     // Rutas principales obtención de endpoints
 
     // Ruta raíz obtención de respuestas
