@@ -135,7 +135,7 @@ export class UserService {
     const tokenPayload = { id: user.id };
 
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET as string, {
-      expiresIn: "5h",
+      expiresIn: "1h",
     });
 
     return { token };

@@ -14,7 +14,7 @@ const envSchema = Joi.object({
   DB_PORT: Joi.number().required(),
   PORT: Joi.number().default(3000),
   JWT_SECRET: Joi.string().required(),
-  GROQ_APY_KEY: Joi.string().required(),
+  GROQ_API_KEY: Joi.string().required(),
   GROQ_MODEL: Joi.string().optional(),
 })
   .unknown()

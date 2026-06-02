@@ -6,11 +6,11 @@ import OpenAI from "openai";
  * 
  * @example
  * ```typescript
- * const groq = OpenAIClient.getInstance();
+ * const groq = GroqClient.getInstance();
  * const response = await groq.chat.completions.create({...});
  * ```
  */
-export class OpenAIClient {
+export class GroqClient {
   private static instance: OpenAI | null = null;
 
   /**
@@ -21,17 +21,17 @@ export class OpenAIClient {
 
   /**
    * Returns the singleton instance of the OpenAI client.
-   * Creates the instance on first call using the GROQ_APY_KEY environment variable.
+   * Creates the instance on first call using the GROQ_API_KEY environment variable.
    * 
    * @returns The shared OpenAI client instance
-   * @throws {Error} If GROQ_APY_KEY environment variable is not set
+   * @throws {Error} If GROQ_APi_KEY environment variable is not set
    */
   public static getInstance(): OpenAI {
     if (!this.instance) {
-      const apiKey = process.env.GROQ_APY_KEY || process.env.GROQ_API_KEY;
+      const apiKey = process.env.GROQ_API_KEY;
 
       if (!apiKey) {
-        throw new Error("GROQ_APY_KEY environment variable is not set");
+        throw new Error("GROQ_API_KEY environment variable is not set");
       }
       
       this.instance = new OpenAI({ 

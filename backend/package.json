@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node -e \"const fs=require('fs'); const path=require('path'); const src=path.join(process.cwd(),'src/models/initial_form.json'); const dest=path.join(process.cwd(),'dist/models/initial_form.json'); fs.mkdirSync(path.dirname(dest), {recursive:true}); fs.copyFileSync(src,dest);\"",
     "start": "node dist/app.js",
     "dev": "nodemon --watch src --exec ts-node src/app.ts",
     "prod": "npm run build && npm run start",

@@ -3,7 +3,7 @@ import { Consulting } from "../entities/consulting.entity";
 import { ConsultingKpiArea } from "../entities/consulting_kpi_area.entity";
 import { User } from "../entities/user.entity";
 import { FormParser } from "./form_parser.service";
-import { OpenAIClient } from "./openai.client";
+import { GroqClient } from "./groq.client";
 import {
   IFormToRecieve,
   IFormToSend,
@@ -19,7 +19,7 @@ import {
   FollowUpResponseSchema,
   InitResponse,
   FollowUpResponse,
-} from "../models/schemas/openai_schemas";
+} from "../models/schemas/groq_schemas";
 import { ResponseType } from "../models/enums/response_type.enum";
 import { IAreas } from "../models/interfaces/kpi_areas.interface";
 import { StatusArea } from "../models/enums/kpi_status.enum";
@@ -193,7 +193,7 @@ Output Format: You must strictly follow the JSON Schema provided in the API requ
   ): Promise<IFormToSend> {
     if (!data) throw Error("Invalid form data.");
 
-    const openai = OpenAIClient.getInstance();
+    const groq = GroqClient.getInstance();
 
     // Create consulting session if this is the first submission
     if (!data.consultingID || data.consultingID === -1) {
@@ -244,7 +244,7 @@ Output Format: You must strictly follow the JSON Schema provided in the API requ
     }
 
     try {
-      const completion = await openai.chat.completions.create({
+      const completion = await groq.chat.completions.create({
         model: process.env.GROQ_MODEL || this.DEFAULT_GROQ_MODEL,
         max_completion_tokens:
           Number(process.env.GROQ_MAX_COMPLETION_TOKENS) ||

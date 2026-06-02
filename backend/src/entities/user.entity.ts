@@ -36,3 +36,6 @@ export class User {
   @OneToMany(() => AccessLog, (log) => log.user, { cascade: true })
     accessLogs!: AccessLog[];
 }
+
+
+

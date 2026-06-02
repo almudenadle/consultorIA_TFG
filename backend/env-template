@@ -8,7 +8,7 @@ JWT_SECRET=a_jwt_secret_key
 # Server Configuration
 PORT=3000
 
-GROQ_APY_KEY
+GROQ_API_KEY
 GROQ_MODEL=openai/gpt-oss-20b
 
 # Email Configuration
