@@ -27,8 +27,8 @@ import { StatusArea } from "../models/enums/kpi_status.enum";
  * Handles consulting creation, prompt generation, structured response parsing, and KPI updates.
  */
 export class ConsultingService {
-  private static readonly MAX_NUM_QUESTIONS = 30;
-  private static readonly MAX_NUM_QUESTIONS_PER_FORM = 4;
+  private static readonly MAX_NUM_QUESTIONS = 9;
+  private static readonly MAX_NUM_QUESTIONS_PER_FORM = 2;
   private static readonly MIN_SCORE = 8;
   private static readonly AREA_FINISHED = "FINISHED";
   private static readonly DEFAULT_GROQ_MODEL = "openai/gpt-oss-20b";
