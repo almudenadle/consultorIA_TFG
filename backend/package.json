@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && node -e \"const fs=require('fs'); const path=require('path'); const src=path.join(process.cwd(),'src/models/initial_form.json'); const dest=path.join(process.cwd(),'dist/models/initial_form.json'); fs.mkdirSync(path.dirname(dest), {recursive:true}); fs.copyFileSync(src,dest);\"",
+    "build": "tsc && node -e \"const fs=require('fs'); const path=require('path'); const copy=(srcRel,destRel)=>{const src=path.join(process.cwd(),srcRel); const dest=path.join(process.cwd(),destRel); fs.mkdirSync(path.dirname(dest),{recursive:true}); fs.copyFileSync(src,dest);}; copy('src/models/initial_form.json','dist/models/initial_form.json'); copy('src/models/schemas/groq_assistant_instructions.txt','dist/models/schemas/groq_assistant_instructions.txt');\"",
     "start": "node dist/app.js",
     "dev": "nodemon --watch src --exec ts-node src/app.ts",
     "prod": "npm run build && npm run start",
