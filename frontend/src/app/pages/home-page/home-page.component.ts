@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
+import { ReportService } from '../../services/report.service';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -29,6 +30,7 @@ import { BadgeModule } from 'primeng/badge';
 import { PaginatorModule } from 'primeng/paginator';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { Menu } from 'primeng/menu';
+import { SendReportEmailComponent } from '../../components/send-report-email/send-report-email.component';
 import {
   GenericDialogComponent,
   DialogButton,
@@ -71,6 +73,7 @@ import {
     BadgeModule,
     PaginatorModule,
     ProgressBarModule,
+    SendReportEmailComponent,
     GenericDialogComponent,
   ],
   providers: [MessageService],
@@ -81,6 +84,7 @@ export class HomePageComponent implements OnInit {
   // Services injected using modern Angular inject() function
   private authService = inject(AuthService);
   private userService = inject(UserService);
+  private reportService = inject(ReportService);
   private router = inject(Router);
   private consultingService = inject(ConsultingService);
   private messageService = inject(MessageService);
@@ -758,7 +762,24 @@ export class HomePageComponent implements OnInit {
     this.resetModalState();
   }
 
+  /**
+   * Opens the email dialog to send a report by email.
+   *
+   * @param {number} consultingId - The ID of the consulting whose report will be sent
+   * @param {Event} event - DOM event to prevent row click propagation
+   */
+  openEmailDialog(consultingId: number, event: Event): void {
+    event.stopPropagation();
+    this.emailDialog.open(consultingId);
+  }
+
+  generateReport(consultingId: number, event: Event): void {
+    event.stopPropagation();
+    this.reportService.viewPdfReport(consultingId);
+  }
+
   @ViewChild('userMenu') userMenu!: Menu;
+  @ViewChild(SendReportEmailComponent) emailDialog!: SendReportEmailComponent;
 
   userMenuItems = [
     {

@@ -1,0 +1,181 @@
+<div class="proposal-container">
+  <!-- Sección 1: Panel principal con la propuesta -->
+  <p-panel [toggleable]="false">
+    <!-- Header personalizado con botón -->
+    <ng-template pTemplate="header">
+      <div class="panel-header-content">
+        <div class="header-title-section">
+          <i class="pi pi-file-check header-icon"></i>
+          <div class="title-content">
+            <span class="panel-title">Propuesta de Consultoría</span>
+            <span class="panel-subtitle"
+              >Análisis y recomendaciones personalizadas</span
+            >
+          </div>
+        </div>
+        <div class="header-buttons">
+          <p-button
+            label="Enviar Informe"
+            icon="pi pi-send"
+            iconPos="left"
+            styleClass="send-button"
+            [text]="true"
+            [raised]="true"
+            (onClick)="openEmailDialog()"
+            pTooltip="Envía el informe por correo electrónico"
+            tooltipPosition="bottom"
+          />
+          <p-button
+            #downloadButton
+            label="Descargar Informe"
+            icon="pi pi-download"
+            iconPos="left"
+            styleClass="download-button"
+            [text]="true"
+            [raised]="true"
+            [disabled]="isGenerating()"
+            [loading]="isGenerating()"
+            (onClick)="generateReport()"
+            pTooltip="Genera y descarga el informe completo en PDF"
+            tooltipPosition="bottom"
+          />
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Resumen Ejecutivo -->
+    <div class="section summary-section">
+      <h3 class="section-title">
+        <i class="pi pi-file-edit"></i> Resumen Ejecutivo
+      </h3>
+      <div class="proposal-content">
+        <p>{{ proposalData.summary }}</p>
+      </div>
+    </div>
+
+    <!-- Propuesta Detallada -->
+    <div class="section proposal-section">
+      <h3 class="section-title">
+        <i class="pi pi-book"></i> Propuesta Detallada
+      </h3>
+      <div class="proposal-content">
+        <p class="proposal-text">{{ proposalData.proposal }}</p>
+      </div>
+    </div>
+
+    <!-- Recomendaciones Clave -->
+    <div class="section recommendations-section">
+      <h3 class="section-title">
+        <i class="pi pi-check-circle"></i> Recomendaciones Clave
+      </h3>
+
+      <p-accordion
+        [multiple]="true"
+        [(value)]="accordionValue"
+        styleClass="recommendations-accordion"
+      >
+        @for (rec of proposalData.keyRecommendations; track rec.id) {
+          <p-accordion-panel [value]="rec.id" styleClass="rec-panel">
+            <p-accordion-header styleClass="rec-panel-header">
+              <div class="rec-header-content">
+                <span class="recommendation-number">{{ $index + 1 }}</span>
+                <span class="rec-title">{{ rec.title }}</span>
+                <span class="rec-labels">
+                  @for (label of rec.labels; track label) {
+                    <p-tag
+                      [value]="label"
+                      [rounded]="true"
+                      styleClass="rec-label-tag"
+                    />
+                  }
+                </span>
+              </div>
+            </p-accordion-header>
+
+            <p-accordion-content styleClass="rec-panel-content">
+              <div class="rec-description">
+                <p>{{ rec.description }}</p>
+              </div>
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    </div>
+
+    <!-- Impacto Estimado -->
+    <div class="section impact-section">
+      <h3 class="section-title">
+        <i class="pi pi-chart-line"></i> Impacto Estimado
+      </h3>
+      <div class="impact-stats">
+        <!-- Plazo de Implementación -->
+        <div class="impact-stat-item">
+          <div class="stat-header">
+            <span class="stat-label">
+              <i class="pi pi-clock"></i> Plazo de Implementación
+            </span>
+            <span class="stat-value">{{
+              getTimeframeLabel(proposalData.estimatedImpact.timeframe)
+            }}</span>
+          </div>
+          <div class="stat-bar-container">
+            <div class="stat-bar stat-bar-timeframe">
+              <div class="gradient-bar"></div>
+              <div
+                class="stat-indicator"
+                [attr.data-level]="proposalData.estimatedImpact.timeframe"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Complejidad -->
+        <div class="impact-stat-item">
+          <div class="stat-header">
+            <span class="stat-label">
+              <i class="pi pi-cog"></i> Complejidad
+            </span>
+            <span class="stat-value">{{
+              getComplexityLabel(proposalData.estimatedImpact.complexity)
+            }}</span>
+          </div>
+          <div class="stat-bar-container">
+            <div class="stat-bar stat-bar-complexity">
+              <div class="gradient-bar"></div>
+              <div
+                class="stat-indicator"
+                [attr.data-level]="proposalData.estimatedImpact.complexity"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nivel de Inversión -->
+        <div class="impact-stat-item">
+          <div class="stat-header">
+            <span class="stat-label">
+              <i class="pi pi-dollar"></i> Nivel de Inversión
+            </span>
+            <span class="stat-value">{{
+              getInvestmentLabel(proposalData.estimatedImpact.investmentLevel)
+            }}</span>
+          </div>
+          <div class="stat-bar-container">
+            <div class="stat-bar stat-bar-investment">
+              <div class="gradient-bar"></div>
+              <div
+                class="stat-indicator"
+                [attr.data-level]="proposalData.estimatedImpact.investmentLevel"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- El mensaje de error ahora se muestra en el popup global -->
+  </p-panel>
+</div>
+
+<!-- Email Dialog Component -->
+<app-send-report-email />

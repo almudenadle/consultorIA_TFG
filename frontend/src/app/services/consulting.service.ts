@@ -11,6 +11,7 @@ import {
 } from '../interface/form_field.interface';
 import { enviroment } from '../../enviroment/enviroment';
 import { ConsultingSummary } from '../interface/consulting_sumary.interface';
+import { IConsultingProposal } from '../interface/consulting.proposal.interface';
 import { ErrorService } from './error.service';
 
 /**
@@ -152,6 +153,7 @@ export class ConsultingService {
             response: q.response,
           })),
           isComplete: !data.questions || data.questions.length === 0,
+          shouldGenerateProposal: data.shouldGenerateProposal || false,
           assistantMessage: data.assistantMessage || undefined,
           currentArea: data.currentArea,
           allAreas: data.allAreas,

@@ -29,6 +29,25 @@ export class AssistantMessageComponent implements OnChanges {
   private static readonly GLOBAL_PROGRESS_THRESHOLD_NEUTRAL = 7.0;
 
   /**
+   * Default messages shown when entering the proposal phase,
+   * one per score tier. They are displayed via the typewriter animation.
+   */
+  private static readonly PROPOSAL_MESSAGE_SAD =
+    ' El diagnóstico revela áreas con margen de mejora significativo. '
+    + 'He preparado una propuesta centrada en los puntos más críticos para '
+    + 'que puedas empezar a revertir la situación cuanto antes.';
+
+  private static readonly PROPOSAL_MESSAGE_NEUTRAL =
+    'El diagnóstico muestra una base sólida con algunas oportunidades '
+    + 'claras de crecimiento. He generado una propuesta personalizada para '
+    + 'que puedas llevar tu negocio al siguiente nivel.';
+
+  private static readonly PROPOSAL_MESSAGE_HAPPY =
+    '¡Excelente diagnóstico! Tu empresa muestra una madurez muy alta en '
+    + 'las áreas analizadas. He preparado una propuesta orientada a '
+    + 'consolidar y seguir ampliando esa ventaja competitiva.';
+
+  /**
    * Assistant image paths constants
    */
   private static readonly IMAGE_PATH_SAD = '../../../assets/sad_assistant.png';
@@ -63,7 +82,7 @@ export class AssistantMessageComponent implements OnChanges {
    * Flag to indicate if we're in the proposal phase
    * When true, avatar changes based on global progress instead of meanVelocity
    */
-
+  @Input() isProposalPhase: boolean = false;
 
   /**
    * Flag to track if there's currently a message to display
@@ -95,11 +114,28 @@ export class AssistantMessageComponent implements OnChanges {
    * Modularized to handle specific change detection for inputs.
    */
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['meanVelocity'] && !changes['meanVelocity'].firstChange) {
-      this.handleVelocityChange(changes['meanVelocity'].currentValue);
+    // True only in the exact cycle where isProposalPhase flips to true.
+    const justEnteredProposalPhase =
+      !!changes['isProposalPhase'] &&
+      changes['isProposalPhase'].currentValue === true &&
+      changes['isProposalPhase'].previousValue !== true;
+
+    if (this.isProposalPhase) {
+      if (changes['isProposalPhase'] || changes['areas']) {
+        this.handleGlobalProgressChange(justEnteredProposalPhase);
+      }
+    } else {
+      // Outside proposal phase: avatar tracks meanVelocity.
+      if (changes['meanVelocity'] && !changes['meanVelocity'].firstChange) {
+        this.handleVelocityChange(changes['meanVelocity'].currentValue);
+      }
     }
 
-    if (changes['message']) {
+    // Skip updating the message from the parent input when we just entered
+    // proposal phase: handleGlobalProgressChange already injected the right
+    // phase-specific message; processing 'changes.message' here would
+    // overwrite it with the stale last form message.
+    if (changes['message'] && !justEnteredProposalPhase) {
       this.handleMessageChange(changes['message'].currentValue);
     }
   }
@@ -122,7 +158,52 @@ export class AssistantMessageComponent implements OnChanges {
     }
   }
 
-  
+  /**
+   * Calculates global progress when in proposal phase.
+   * Uses the average of actualScore from all areas to determine avatar state.
+   * Thresholds:
+   * - < 5.0: SAD
+   * - 5.0-7.0: NEUTRAL
+   * - > 7.0: HAPPY
+   *
+   * @param justEntered True only when isProposalPhase just flipped to true.
+   *   When true, always injects the default proposal-tier message.
+   */
+  private handleGlobalProgressChange(justEntered: boolean = false): void {
+    // If there are no areas yet we fall back to neutral with no message change.
+    if (!this.areas || this.areas.length === 0) {
+      this.assistantImagePath = AssistantMessageComponent.IMAGE_PATH_NEUTRAL;
+      return;
+    }
+
+    // Calculate average of actualScore from all areas
+    const totalScore = this.areas.reduce(
+      (sum, area) => sum + area.actualScore,
+      0,
+    );
+    const globalScore = totalScore / this.areas.length;
+
+    let proposalMessage: string;
+
+    if (globalScore < AssistantMessageComponent.GLOBAL_PROGRESS_THRESHOLD_SAD) {
+      this.assistantImagePath = AssistantMessageComponent.IMAGE_PATH_SAD;
+      proposalMessage = AssistantMessageComponent.PROPOSAL_MESSAGE_SAD;
+    } else if (
+      globalScore <= AssistantMessageComponent.GLOBAL_PROGRESS_THRESHOLD_NEUTRAL
+    ) {
+      this.assistantImagePath = AssistantMessageComponent.IMAGE_PATH_NEUTRAL;
+      proposalMessage = AssistantMessageComponent.PROPOSAL_MESSAGE_NEUTRAL;
+    } else {
+      this.assistantImagePath = AssistantMessageComponent.IMAGE_PATH_HAPPY;
+      proposalMessage = AssistantMessageComponent.PROPOSAL_MESSAGE_HAPPY;
+    }
+
+    // Always show the proposal message the first time we enter the phase.
+    // On subsequent area updates we leave the displayed message as-is.
+    if (justEntered) {
+      this.handleMessageChange(proposalMessage);
+    }
+  }
 
   /**
    * Modular handler for message changes.

@@ -9,4 +9,6 @@ export enum ResponseType {
   INIT = "init",
   /** Phase 2: FOLLOW_UP (KPI tracking to generate new responses) */
   FOLLOW_UP = "follow_up",
+  /** Phase 3: Proposal/report generation */
+  PROPOSAL = "proposal",
 }

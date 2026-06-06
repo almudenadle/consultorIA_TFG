@@ -57,7 +57,6 @@ export const initOrm = async (): Promise<void> => {
 //   synchronize: true, 
 //   logging: false,
   
-//   // LA SOLUCIÓN CLAVE:
 //   // Le dice a TypeORM que busque en la carpeta dist (producción) o src (local) 
 //   // cualquier archivo que termine en .entity.js o .entity.ts
 //   entities: [path.join(__dirname, '../**/entities/*.entity.{ts,js}')],

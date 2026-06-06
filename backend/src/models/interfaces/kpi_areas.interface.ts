@@ -14,5 +14,7 @@ export interface IAreas {
   numQuestions: number;
   // Contexto resumido de lo que se sabe de este área.
   summary: string;
+  // Propuesta de solución comercial generada en Fase 3 para vender un producto de terceros.
+  proposal: string;
   status: StatusArea;
 }

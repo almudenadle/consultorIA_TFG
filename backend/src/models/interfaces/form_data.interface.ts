@@ -29,6 +29,7 @@ export interface IFormToSend {
   questions: IFormFieldToSend[];
   isFirstForm: boolean;
   assistantMessage?: string;
+  shouldGenerateProposal?: boolean;
   currentArea?: IAreaDataToSend;
   allAreas?: IAreaDataToSend[];
   meanVelocity: number;

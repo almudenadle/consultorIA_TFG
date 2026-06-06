@@ -1,0 +1,61 @@
+<!-- Email Dialog Modal -->
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  [breakpoints]="{ '768px': '90vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [position]="'top'"
+  styleClass="email-dialog"
+  (onHide)="closeDialog()"
+>
+  <ng-template #header>
+    <div class="dialog-header-content">
+      <i class="pi pi-envelope dialog-icon"></i>
+      <h3>Enviar Informe por Email</h3>
+    </div>
+  </ng-template>
+
+  <div class="dialog-body-content">
+    <p class="dialog-description">
+      El informe se enviará al siguiente correo electrónico. Puedes modificarlo
+      si lo deseas.
+    </p>
+
+    <div class="form-field">
+      <label for="recipient-email" class="field-label">
+        Correo electrónico
+      </label>
+      <input
+        pInputText
+        id="recipient-email"
+        [(ngModel)]="recipientEmail"
+        placeholder="ejemplo@correo.com"
+        class="email-input"
+        [disabled]="isSendingEmail"
+        type="email"
+      />
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <div class="dialog-footer-content">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (onClick)="closeDialog()"
+        [disabled]="isSendingEmail"
+        styleClass="btn-secondary"
+        [outlined]="true"
+      />
+      <p-button
+        label="Enviar"
+        icon="pi pi-send"
+        (onClick)="sendReportByEmail()"
+        [loading]="isSendingEmail"
+        styleClass="btn-primary"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

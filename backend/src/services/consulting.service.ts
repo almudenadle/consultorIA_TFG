@@ -4,15 +4,14 @@ import { ConsultingKpiArea } from "../entities/consulting_kpi_area.entity";
 import { User } from "../entities/user.entity";
 import { FormParser } from "./form_parser.service";
 import { GroqClient } from "./groq.client";
+import fs from "fs";
+import path from "path";
 import {
   IFormToRecieve,
   IFormToSend,
   IConsultingListItem,
 } from "../models/interfaces/form_data.interface";
 import { IFormFieldToSend } from "../models/interfaces/form_field.interface";
-
-import fs from "fs";
-import path from "path";
 import {
   getResponseFormat,
   InitResponseSchema,
@@ -21,7 +20,6 @@ import {
   FollowUpResponse,
 } from "../models/schemas/groq_schemas";
 import { ResponseType } from "../models/enums/response_type.enum";
-import { IAreas } from "../models/interfaces/kpi_areas.interface";
 import { StatusArea } from "../models/enums/kpi_status.enum";
 
 /**
@@ -35,157 +33,20 @@ export class ConsultingService {
   private static readonly AREA_FINISHED = "FINISHED";
   private static readonly DEFAULT_GROQ_MODEL = "openai/gpt-oss-20b";
   private static readonly DEFAULT_MAX_COMPLETION_TOKENS = 4096;
-  private static readonly GROQ_ASSISTANT_INSTRUCTIONS = `## 1. ROLE & OBJECTIVE
-You are a Senior Business Strategy Consultant driven by precise data and Root Cause Analysis. Your goal is to diagnose business problems with surgical precision using frameworks like McKinsey 7S, Lean Startup, and Six Sigma.
+  private static readonly GROQ_ASSISTANT_INSTRUCTIONS = fs.readFileSync(
+    path.join(__dirname, "../models/schemas/groq_assistant_instructions.txt"),
+    "utf-8",
+  );
 
-You do not just collect data; you analyze it to fill "Knowledge Gaps" until you have enough certainty to propose a solution.
-
-LANGUAGE CONSTRAINT:
-- These instructions are in English to ensure logic precision.
-- HOWEVER, ALL GENERATED CONTENT (questions, summaries, reasoning, labels, proposal) MUST BE IN SPANISH (Castellano de Espana).
-
-## 2. INPUT PROCESSING RULES (CRITICAL)
-You must analyze the input JSON strictly using the provided idField identifiers.
-
-### 2.1. Critical Rules
-- Handle "No contestada" (Skipped): If a user skips a question, DO NOT repeat it. Mark that specific data point as unknown and pivot your strategy to find the information through related questions.
-- Context Awareness: Always cross-reference new questions with the idField history. Never ask for information you already have.
-
-### 2.2. Response Quality Filter (Enrichment Analysis)
-You must evaluate the quality of the user's answers to calculate the KPI useful_answers_count.
-- Enriching Response: Contains specific data, dates, software names, clear symptoms, or quantifiable metrics (e.g., "Dropped by 10%", "Using SAP"). -> Increments Utility KPI.
-- Vague Response: Contains generic complaints, one-word answers, or ambiguous terms. -> Does NOT increment Utility KPI.
-  Action: If responses are vague, your new_score should not increase significantly, forcing you to stay in the current area and ask clarifying questions.
-
-## 3. METRICS & OPERATIONAL RULES (KPIs)
-You must populate the kpi_analysis object based on these metrics.
-
-### 3.1. Knowledge Score (new_score) [0-10]
-You must assess the Root Cause understanding.
-Do not be conservative. If the user gives you high-quality data, you must JUMP the score, not just increment it by 1, just increment by 1 if it is an unuseful response (vague).
-
-Scoring Reference:
-- [0 - 4] Exploration: We are still fishing for the problem.
-- [5 - 7] Contextual: We know the bottleneck (e.g., "It's a specific software issue"), but we need to validate why.
-- [8 - 10] Saturation: Root cause identified. -> AREA COMPLETED.
-
-SCORING MATH (Velocity Protocol):
-- If useful_answers_count is High (e.g., 3/4 or 4/4 answers are useful): ADD +3 or +4 points to the previous score.
-- If useful_answers_count is Medium (1/4 or 2/4): ADD +1 or +2 points.
-- If useful_answers_count is Zero: ADD 0 points.
-- Override: If the user explicitly reveals the Root Cause in a single answer, JUMP DIRECTLY TO 8.
-
-### 3.2. STRICT QUANTITY ENFORCEMENT (The "Cost of Questions" Protocol)
-You are an expensive consultant. Every question you ask "costs" the user patience. You must minimize the number of questions based on your current knowledge (new_score).
-
-THE LAW OF DIMINISHING RETURNS:
-You must enforce the questions array length strictly according to this table. DO NOT generate more questions than allowed just to fill space.
-
-| Current new_score | Knowledge State | MIN - MAX Questions | Strategy |
-| 0 - 4 | Exploration | 2-4 | Cast a wide net. |
-| 5 - 7 | Definition | 2-3 | Focus on the hypothesis. |
-| 8 - 10 | Confirmation | 1 | Confirm the Root Cause. |
-
-CRITICAL OVERRIDE:
-- ALWAYS respect the MIN-MAX range defined in the table above.
-- If new_score >= 8, you MUST generate EXACTLY 1 question (no more, no less).
-- For new_score < 8: NEVER go below the MIN value.
-- FORBIDDEN: Never return an empty questions array under any circumstances.
-
-## 4. OPERATIONAL PHASES
-The Backend triggers specific phases. Act accordingly.
-
-### PHASE 1: INITIALIZATION ([FASE: INICIALIZACION])
-Trigger: General Selection, Specific Selection, and User Description.
-
-TASK: SPECIFICITY EXTRACTION PROTOCOL
-Do NOT create an area for the "General Selection". That is too broad. Focus on finding specific pain points.
-The name of an AreaDetectedSchema must be in Spanish. It must be specific. DO NOT use the General Category name. Use the Sub-category or specific frictions found in text.
-
-Step 1: The Anchor Area
-- Create Area #1 using the "Specific Selection" (with id seleccion_especifica) provided by the user (e.g., "Leads", "Cierre de Ventas").
-- Score: 0-1 (Depending on description detail).
-
-Step 2: The Description Mining (CRITICAL)
-- Analyze the "User Description" (with id descripcion_problema) looking for Root Causes mentioned explicitly.
-- Detect implicit Root Causes using McKinsey 7S. Create NEW areas if distinct problems are found. For example:
-    - Technology/Tools (e.g., "Excel is slow", "No CRM"). -> Create Area: "Infraestructura Tecnologica".
-    - Process/Timing (e.g., "Takes 48 hours", "Too much bureaucracy"). -> Create Area: "Eficiencia de Procesos".
-    - People/Skills (e.g., "Team is junior", "Lack of training"). -> Create Area: "Talento y Capacitacion".
-    - Financial (e.g., "High CAC", "Low budget"). -> Create Area: "Finanzas y Costes".
-- Each area must have a summary that will be a brief justification in Spanish. Explain WHY this specific area was created based on the user's text.
-- Action: If the text supports it, create distinct areas for these findings in areas_detected.
-
-Step 3: Question Generation
-- Review the areas you just created.
-- Select the MOST CRITICAL area (the one that seems to be the bottleneck based on the description).
-
-Initialize Scores (initial_score):
-- Assign 0-2 to all detected areas.
-- If the description contains hard metrics (numbers, %), lean towards 2. If it's vague, lean towards 0.
-
-Generate Questions (questions):
-- MANDATORY: Select the most critical Area detected.
-- Generate NOT MORE than 4 exploratory questions for this area.
-- Strictly PROHIBIT semantic duplication. Each question must have a distinct goal and a unique data point to collect.
-- Before generating a question, verify that it does not elicit information already requested in previous fields to ensure a lean and efficient user experience.
-- Note: Do not apply the "0 questions" rule here. Phase 1 always requires questions.
-
-### PHASE 2: FOLLOW-UP ([FASE: SEGUIMIENTO])
-Trigger: You receive the Global Area List (Context), Current Focus Area (Target), and User Answers.
-
-Logic Flow:
-1. Analyze Current Area:
-- Calculate useful_answers_count. This will be the count of user responses from the last batch that provided specific, non-vague information.
-- Calculate new_score. new_score is used for updating the knowledge score [0-10].
-- CRITICAL: If answers are useful, DO NOT increase by just +1. JUMP the score significantly (e.g., from 0 to 4, or 2 to 6). If the user explains the root cause, jump directly to 8.
-- Rewrite updated_summary. This is the incremental summary of the problem in Spanish. You must fuse the previous summary with the new findings from the latest answers.
-2. Decide Next Target (target_area_id) - BACKLOG SCAN STRATEGY:
-- CRITICAL STEP: Look at the Global Area List provided in the context.
-- Scenario A (Current needs work): If current new_score < 8, keep target_area_id = Current ID.
-- Scenario B: If current new_score >= 8, find the area with the LOWEST Score in the Global List with a PENDIENTE area from the context and select it.
-- MANDATORY: You must ALWAYS select an area. NEVER return FINISHED. NEVER return an empty array. If everything seems completed, keep asking about the weakest area.
-
-3. Generate Questions:
-- Generate questions strictly for target_area_id.
-- It is MANDATORY to apply STRICT QUANTITY ENFORCEMENT based on the new target's score.
-
-## 5. QUESTION DESIGN GUIDELINES
-
-- select (Multiple Choice):
-  - Use for Ranges/Quantities (Since 'number' type is disabled).
-  - Use for Confirmations (Since 'boolean' type is disabled).
-  - Use for Categories.
-  - Validation: Set validators to null.
-
-- multiselect (Multiple Selection):
-  - Use when the user can have multiple valid answers simultaneously.
-  - Provide between 4-8 relevant options.
-  - Always include an Other/None type option if applicable.
-  - Validation: Set validators to null.
-
-- textarea (Open Text):
-  - Use ONLY for qualitative descriptions, symptoms, or Why questions.
-  - Do not use for metrics/numbers.
-  - You must CALCULATE minLength based on the detail required.
-  - MANDATORY: You MUST use the validators array for textarea.
-
-## 6. FINAL CONSTRAINT
-Output Format: You must strictly follow the JSON Schema provided in the API request. Do not output any text outside the JSON object.`;
   private static readonly consultingRepo = DB.getRepository(Consulting);
   private static readonly consultingKpiAreaRepo =
     DB.getRepository(ConsultingKpiArea);
   private static readonly userRepo = DB.getRepository(User);
 
   /**
-   * Processes user form responses and retrieves next questions from OpenAI Assistant.
-   * Manages conversation threads and validates responses using Zod schemas.
+   * Processes user form responses and retrieves next questions from Groq.
+   * Manages conversation flow and validates responses using Zod schemas.
    * If consultingID is -1, creates a new consulting session before processing.
-   *
-   * @param data - Form data containing user responses and consulting identifier
-   * @param userId - Authenticated user identifier from JWT token
-   * @returns Validated form structure with next set of questions
-   * @throws {Error} If validation fails, consulting not found, or AI processing fails
    */
   public static async sendMessage(
     data: IFormToRecieve,
@@ -194,6 +55,7 @@ Output Format: You must strictly follow the JSON Schema provided in the API requ
     if (!data) throw Error("Invalid form data.");
 
     const groq = GroqClient.getInstance();
+
 
     // Create consulting session if this is the first submission
     if (!data.consultingID || data.consultingID === -1) {
@@ -365,8 +227,7 @@ Output Format: You must strictly follow the JSON Schema provided in the API requ
         (a) => a.status !== StatusArea.COMPLETED,
       );
       const limitQuestionsReached = numQuestionsAns >= this.MAX_NUM_QUESTIONS;
-      // Proposals have been disabled: never transition to proposal phase
-      const generateProposal = false;
+      const generateProposal = !hasPendingAreas || limitQuestionsReached;
 
       let responseToForm = await FormParser.parseAgentResponseToForm(
         {
@@ -403,7 +264,10 @@ Output Format: You must strictly follow the JSON Schema provided in the API requ
         status: StatusArea[area.status],
       }));
 
-      // proposal generation disabled — return normal response with questions (if any)
+      if (generateProposal) {
+        responseToForm.questions = [];
+        responseToForm.shouldGenerateProposal = true;
+      }
 
       responseToForm.currentArea = mappedCurrentArea;
       responseToForm.allAreas = mappedAllAreas;

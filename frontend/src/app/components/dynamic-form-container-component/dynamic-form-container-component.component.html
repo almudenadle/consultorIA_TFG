@@ -123,5 +123,20 @@
       }
     </div>
 
+    <!-- Proposal Section -->
+    @if (isGeneratingProposal()) {
+      <div class="loading-container">
+        <p-progressSpinner />
+        <p>Generando propuesta de consultoría...</p>
+      </div>
+    }
+
+    @if (showProposal() && proposalData()) {
+      <app-consulting-proposal
+        [proposalData]="proposalData()!"
+        [consultingId]="consultingID!"
+      />
+    }
+
   }
 </div>

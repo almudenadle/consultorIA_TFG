@@ -51,6 +51,7 @@ export interface IFormFromBackend {
   formID: number;
   questions: IFormField[];
   isFirstForm: boolean;
+  shouldGenerateProposal?: boolean;
   assistantMessage?: string;
   currentArea?: IKPIArea;
   allAreas?: IKPIArea[];
@@ -90,6 +91,7 @@ export interface IDynamicForm {
   description?: string;
   fields: IFormField[];
   isComplete: boolean;
+  shouldGenerateProposal?: boolean;
   assistantMessage?: string;
   currentArea?: IKPIArea;
   allAreas?: IKPIArea[];

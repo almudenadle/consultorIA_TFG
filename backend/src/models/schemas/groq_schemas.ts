@@ -177,9 +177,104 @@ const KeyRecommendationSchema = z.object({
     ),
 });
 
+/**
+ * Schema for the final consulting proposal report.
+ * Used to generate the complete report payload with summary, proposal,
+ * conclusion, recommendations, and estimated impact.
+ */
+export const ProposalSchema = z.object({
+  summary: z
+    .string()
+    .min(100)
+    .max(1000)
+    .describe("Executive summary of the identified problem"),
+  proposal: z
+    .string()
+    .min(1000)
+    .max(3500)
+    .describe(
+      "Detailed executive solution proposal in Spanish. Follow the phase 3 system instructions and format the text in multiple readable paragraphs separated by line breaks.",
+    ),
+  conclusion: z
+    .string()
+    .min(2000)
+    .max(3500)
+    .describe(
+      "Executive conclusion in Spanish. Follow the detailed writing and formatting rules defined in the system instructions for phase 3.",
+    ),
+  keyRecommendations: z
+    .array(KeyRecommendationSchema)
+    .min(3)
+    .max(7)
+    .describe(
+      "List of structured key recommendations derived from the consulting proposal.",
+    ),
+  estimatedImpact: z
+    .object({
+      timeframe: z
+        .enum(["corto_plazo", "medio_plazo", "largo_plazo"])
+        .describe(
+          "Expected implementation timeframe (1-3 months, 3-12 months, >12 months).",
+        ),
+      complexity: z
+        .enum(["baja", "media", "alta"])
+        .describe("Technical and organizational complexity of the solution."),
+      investmentLevel: z
+        .enum(["bajo", "moderado", "alto"])
+        .describe("Level of economic investment required (<10%, 10-30%, >30%)."),
+    })
+    .describe("Strategic estimation of impact, timeframe, and resources."),
+});
+
+/**
+ * Schema for commercial proposals per detected area.
+ * Used when the workflow needs a report-style proposal for every area.
+ */
+export const AllAreasProposalSchema = z.object({
+  areaProposals: z
+    .array(
+      z.object({
+        areaId: z
+          .string()
+          .describe(
+            "Semantic area identifier matching the provided area.",
+          ),
+        proposal: z
+          .string()
+          .min(300)
+          .max(1500)
+          .describe(
+            "Executive commercial proposal in Spanish for this specific area. It must be written in continuous and persuasive paragraphs.",
+          ),
+      }),
+    )
+    .describe(
+      "Array of commercial proposals, one for each detected area. Generate a proposal for every area provided in the prompt.",
+    ),
+});
+
 export type InitResponse = z.infer<typeof InitResponseSchema>;
 export type FollowUpResponse = z.infer<typeof FollowUpResponseSchema>;
+export type ProposalResponse = z.infer<typeof ProposalSchema>;
+export type AllAreasProposalResponse = z.infer<typeof AllAreasProposalSchema>;
 export type FormField = z.infer<typeof FormFieldSchema>;
+
+export const initResponseFormat = buildResponseFormat(
+  "init_response",
+  InitResponseSchema,
+);
+export const followUpResponseFormat = buildResponseFormat(
+  "followup_response",
+  FollowUpResponseSchema,
+);
+export const proposalResponseFormat = buildResponseFormat(
+  "proposal_response",
+  ProposalSchema,
+);
+export const allAreasProposalResponseFormat = buildResponseFormat(
+  "all_areas_proposal_response",
+  AllAreasProposalSchema,
+);
 
 function buildResponseFormat(schemaName: string, schema: z.ZodTypeAny) {
   return {
@@ -198,6 +293,8 @@ export function getResponseFormat(responseType: ResponseType) {
       return buildResponseFormat("init_response", InitResponseSchema);
     case ResponseType.FOLLOW_UP:
       return buildResponseFormat("followup_response", FollowUpResponseSchema);
+    case ResponseType.PROPOSAL:
+      return buildResponseFormat("proposal_response", ProposalSchema);
     default:
       throw new Error(`Unknown response type: ${responseType}`);
   }

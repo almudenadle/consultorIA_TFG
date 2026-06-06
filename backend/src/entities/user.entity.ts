@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn
 import { Company } from './company.entity';
 import { Consulting } from './consulting.entity';
 import { AccessLog } from './access_log.entity';
+import { Report } from './report.entity';
 
 
 
@@ -33,9 +34,10 @@ export class User {
   @OneToMany(() => Consulting, (consulting) => consulting.user, { cascade: true })
     consultings!: Consulting[];
 
+  // 1:N Relationship with Report
+  @OneToMany(() => Report, (report) => report.user, { cascade: true })
+    reports!: Report[];
+
   @OneToMany(() => AccessLog, (log) => log.user, { cascade: true })
     accessLogs!: AccessLog[];
 }
-
-
-

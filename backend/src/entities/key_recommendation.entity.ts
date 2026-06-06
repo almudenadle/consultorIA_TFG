@@ -2,7 +2,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
+  JoinColumn,
 } from "typeorm";
+import { Report } from "./report.entity";
 
 /**
  * Represents a single key recommendation associated with a consulting report.
@@ -50,4 +53,16 @@ export class KeyRecommendation {
   @Column({ name: "reportId" })
   reportId!: number;
 
+  /**
+   * Many-to-one relationship with {@link Report}.
+   * When the parent report is deleted, all associated recommendations are removed (CASCADE).
+   *
+   * @relation ManyToOne
+   * @cascade onDelete: CASCADE
+   */
+  @ManyToOne(() => Report, (report) => report.keyRecommendations, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "reportId" })
+  report!: Report;
 }

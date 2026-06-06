@@ -3,11 +3,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  OneToOne,
   ManyToOne,
 } from "typeorm";
 import { Form } from "./form.entity";
 import { ConsultingStatus } from "../models/enums/consulting_status.enum";
 import { User } from "./user.entity";
+import { Report } from "./report.entity";
 import { ConsultingKpiArea } from "./consulting_kpi_area.entity";
 
 @Entity({ name: "consulting" })
@@ -57,6 +59,10 @@ export class Consulting {
   // 1:N Relationship with Form
   @OneToMany(() => Form, (form) => form.consulting, { cascade: true })
   forms!: Form[];
+
+  // 1:1 Relationship with Report
+  @OneToOne(() => Report, (report) => report.consulting, { cascade: true })
+  report!: Report;
 
   // 1:N Relationship with ConsultingKpiArea
   @OneToMany(() => ConsultingKpiArea, (area) => area.consulting, {

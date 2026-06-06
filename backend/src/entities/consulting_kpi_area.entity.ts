@@ -51,7 +51,8 @@ export class ConsultingKpiArea {
    * Written in flowing executive Spanish paragraphs to sell a third-party solution.
    * Populated only when the final proposal phase is triggered.
    */
-  // The project no longer generates commercial proposals. Field removed.
+  @Column({ type: "text", nullable: true })
+  proposal!: string;
 
   /** Current processing status of this area */
   @Column({ type: "enum", enum: StatusArea, default: StatusArea.PENDING })

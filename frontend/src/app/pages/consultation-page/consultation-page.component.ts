@@ -142,6 +142,11 @@ export class ConsultationPageComponent implements OnInit {
    */
   meanVelocity: number = 0;
 
+  /**
+   * Flag indicating if consultation is in proposal phase
+   * When true, assistant avatar reflects global progress
+   */
+  isProposalPhase: boolean = false;
 
   /**
    * Calculated: Dictionary mapping area name to its score
@@ -312,7 +317,10 @@ export class ConsultationPageComponent implements OnInit {
       this.meanVelocity = data.meanVelocity;
     }
 
-    // proposal phase flag was removed — backend no longer sends it
+    // Update proposal phase flag if provided
+    if (data.isProposalPhase !== undefined) {
+      this.isProposalPhase = data.isProposalPhase;
+    }
   }
 
   /**

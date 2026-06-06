@@ -1,0 +1,167 @@
+// ============================================================================
+// EMAIL DIALOG - Modal for sending reports by email
+// ============================================================================
+
+$transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$border-radius-lg: 20px;
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::ng-deep .email-dialog {
+  margin-top: 5rem;
+  
+  .p-dialog {
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    animation: fadeInDown 0.3s ease-out;
+  }
+
+  .p-dialog-header {
+    padding: 1.5rem 2rem;
+    background: var(--p-content-background);
+    border: none;
+    border-bottom: 1px solid var(--p-surface-200);
+
+    .dialog-header-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+
+      .dialog-icon {
+        font-size: 1.5rem;
+        color: var(--p-text-color);
+        transition: none !important;
+        animation: none !important;
+      }
+
+      h3 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: var(--p-text-color);
+      }
+    }
+
+    .p-dialog-header-icon {
+      color: var(--p-text-color);
+    }
+  }
+
+  .p-dialog-content {
+    padding: 2rem;
+    background: var(--p-content-background);
+
+    .dialog-body-content {
+      .dialog-description {
+        margin: 0 0 0.5rem 0;
+        color: var(--p-text-muted-color);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .field-label {
+          font-weight: 600;
+          color: var(--p-text-color);
+          font-size: 0.9rem;
+        }
+
+        .email-input {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border: 2px solid var(--p-surface-300);
+          border-radius: 12px;
+          font-size: 1rem;
+          transition: $transition-default;
+          background: var(--p-content-background);
+          color: var(--p-text-color);
+
+          &:focus {
+            border-color: var(--p-purple-500);
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+
+  .p-dialog-footer {
+    padding: 1.5rem 2rem;
+    background: var(--p-content-background);
+    border-top: 1px solid var(--p-surface-200);
+
+    .dialog-footer-content {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+
+      .btn-secondary {
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: $transition-default;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+        }
+      }
+
+      .btn-primary {
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--p-purple-500), var(--p-purple-600)) !important;
+        border: none !important;
+        font-weight: 600;
+        transition: $transition-default;
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, var(--p-purple-600), var(--p-purple-700)) !important;
+          transform: translateY(-2px);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin-top: 2rem;
+    
+    .p-dialog-content {
+      padding: 1.5rem;
+    }
+
+    .p-dialog-footer {
+      .dialog-footer-content {
+        flex-direction: column;
+        
+        .p-button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

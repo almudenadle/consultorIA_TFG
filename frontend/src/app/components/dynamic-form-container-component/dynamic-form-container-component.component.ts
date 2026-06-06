@@ -24,10 +24,12 @@ import { TagModule } from 'primeng/tag';
 
 // Components
 import { DynamicFormQuestionComponent } from '../dynamic-form-question/dynamic-form-question.component';
+import { ConsultingProposalComponent } from '../consulting-proposal/consulting-proposal.component';
 
 // Services
 import { DynamicFormService } from '../../services/dynamic_form.service';
 import { ConsultingService } from '../../services/consulting.service';
+import { ReportService } from '../../services/report.service';
 import { AuthService } from '../../services/auth.service';
 import { AreaColorService } from '../../services/area-color.service';
 import { ErrorService } from '../../services/error.service';
@@ -39,6 +41,7 @@ import {
   IFormFromBackend,
   IFormResponse,
 } from '../../interface/form_field.interface';
+import { IConsultingProposal } from '../../interface/consulting.proposal.interface';
 import { IKPIArea } from '../../interface/kpi_areas.interface';
 import { IFormIndexEntry } from '../../interface/form_index.interface';
 
@@ -64,6 +67,7 @@ import { IFormIndexEntry } from '../../interface/form_index.interface';
     ProgressSpinnerModule,
     TagModule,
     DynamicFormQuestionComponent,
+    ConsultingProposalComponent,
   ],
   templateUrl: './dynamic-form-container-component.component.html',
   styleUrl: './dynamic-form-container-component.component.scss',
@@ -72,6 +76,7 @@ export class DynamicFormContainerComponent implements OnInit {
   // Services injection
   private dynamicFormService = inject(DynamicFormService);
   private consultingService = inject(ConsultingService);
+  private reportService = inject(ReportService);
   private authService = inject(AuthService);
   private location = inject(Location);
   private cdr = inject(ChangeDetectorRef);
@@ -92,6 +97,7 @@ export class DynamicFormContainerComponent implements OnInit {
     currentArea?: IKPIArea;
     allAreas?: IKPIArea[];
     meanVelocity?: number;
+    isProposalPhase?: boolean;
   }>();
 
   // Output: Emite cuando cambia el índice de formularios (completados + activo)
@@ -113,7 +119,10 @@ export class DynamicFormContainerComponent implements OnInit {
   // Simplified state signals
   isLoading = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
+  isGeneratingProposal = signal<boolean>(false);
   errorMessage = signal<string | undefined>(undefined);
+  showProposal = signal<boolean>(false);
+  proposalData = signal<IConsultingProposal | undefined>(undefined);
 
   // Flag to prevent multiple initializations
   private hasInitialized = false;
@@ -252,6 +261,8 @@ export class DynamicFormContainerComponent implements OnInit {
         this.cdr.detectChanges();
 
         this.scrollToLastFormAndFocus();
+
+        this.loadProposalIfAvailable(consultingId);
 
       },
       error: (error) => {
@@ -451,6 +462,34 @@ export class DynamicFormContainerComponent implements OnInit {
           }
 
           // End the consultation flow when AI returns no further questions.
+          if (nextForm.shouldGenerateProposal && nextForm.fields.length === 0) {
+            if (
+              nextForm.allAreas ||
+              nextForm.currentArea ||
+              nextForm.assistantMessage
+            ) {
+              this.consultationDataUpdated.emit({
+                isProposalPhase: true,
+                currentArea: nextForm.currentArea || undefined,
+                allAreas: nextForm.allAreas || [],
+                assistantMessage: nextForm.assistantMessage || undefined,
+                meanVelocity: nextForm.meanVelocity,
+              });
+            }
+
+            this.isGeneratingProposal.set(true);
+            this.questions = [];
+            this.formGroup = undefined;
+            this.generateProposal();
+
+            // Emitir índice actualizado al finalizar
+            this.emitFormIndex();
+
+            this.cdr.detectChanges();
+            return;
+          }
+
+          // End the consultation flow when AI returns no further questions.
           if (nextForm.fields.length === 0) {
             if (
               nextForm.allAreas ||
@@ -464,6 +503,9 @@ export class DynamicFormContainerComponent implements OnInit {
                 meanVelocity: nextForm.meanVelocity,
               });
             }
+
+            this.showProposal.set(false);
+            this.proposalData.set(undefined);
 
             this.questions = [];
             this.formGroup = undefined;
@@ -481,6 +523,9 @@ export class DynamicFormContainerComponent implements OnInit {
           this.isFirstForm = false;
           this.currentAreaName =
             nextForm.currentArea?.name || 'Sin área asignada';
+
+          this.showProposal.set(false);
+          this.proposalData.set(undefined);
 
           // Emit unified consultation data to parent component
           if (
@@ -559,6 +604,47 @@ export class DynamicFormContainerComponent implements OnInit {
           },
         );
       }
+    });
+  }
+
+  private generateProposal(): void {
+    if (!this.consultingID || this.consultingID === -1) {
+      this.errorMessage.set('Missing consultation ID');
+      this.isGeneratingProposal.set(false);
+      return;
+    }
+
+    this.reportService.generateProposal(this.consultingID).subscribe({
+      next: (proposal) => {
+        this.isGeneratingProposal.set(false);
+        this.proposalData.set(proposal);
+        this.showProposal.set(true);
+        this.consultationDataUpdated.emit({ isProposalPhase: true });
+        this.scrollToProposal();
+      },
+      error: (err) => {
+        this.errorMessage.set(err.message || 'Error al generar propuesta');
+        this.isGeneratingProposal.set(false);
+      },
+    });
+  }
+
+  private loadProposalIfAvailable(consultingId: number): void {
+    this.reportService.getReportByConsultingId(consultingId).subscribe({
+      next: (proposal) => {
+        if (proposal) {
+          this.proposalData.set(proposal);
+          this.showProposal.set(true);
+          this.consultationDataUpdated.emit({ isProposalPhase: true });
+          this.scrollToProposal();
+        }
+      },
+      error: (err) => {
+        const message = String(err?.message || '');
+        if (!message.includes('Report not found')) {
+          this.errorService.showError(err.message || 'Error al obtener propuesta');
+        }
+      },
     });
   }
 
@@ -726,6 +812,15 @@ export class DynamicFormContainerComponent implements OnInit {
         }, 700);
       }
     }, 300);
+  }
+
+  private scrollToProposal(): void {
+    setTimeout(() => {
+      const proposalEl = document.querySelector('app-consulting-proposal');
+      if (proposalEl) {
+        proposalEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 400);
   }
 
 }

@@ -1,11 +1,13 @@
 <div class="home-container">
+  <!-- Toast notifications for user feedback -->
   <p-toast position="top-right" />
 
+  <!-- Header: Top navigation bar with branding and user menu -->
   <header class="home-header">
     <nav class="navbar">
       <div class="logo">
         <i class="pi pi-sparkles"></i>
-        ConsultorIA
+        AI Consultant
       </div>
 
       <div class="search-bar">
@@ -37,9 +39,12 @@
     </nav>
   </header>
 
+  <!-- Main Content Area -->
   <main class="home-content">
+    <!-- Dashboard Section: Main content area with consultations -->
     <section class="dashboard">
       <div class="consultations-section">
+        <!-- Section Header -->
         <div class="section-header">
           <div class="header-left">
             <h2>Tus Consultorías</h2>
@@ -52,6 +57,7 @@
           ></p-button>
         </div>
 
+        <!-- Filter Buttons -->
         <div class="filter-buttons">
           <p-button
             [label]="'Todas (' + totalCount + ')'"
@@ -79,6 +85,7 @@
           </p-button>
         </div>
 
+        <!-- Loading State -->
         @if (!consultings) {
           <div class="loading-state">
             <p-progressSpinner />
@@ -86,6 +93,7 @@
           </div>
         }
 
+        <!-- Consultations Grid -->
         @else {
           @if (filteredConsultings && filteredConsultings.length > 0) {
             <div class="consultations-grid">
@@ -110,6 +118,7 @@
                     Creada el {{ formatDate(consulting.date) }}
                   </p>
 
+                  <!-- Progress Bar for Active consultations -->
                   @if (consulting.statusCons === 0) {
                     <div class="card-progress">
                       <div class="progress-header">
@@ -119,6 +128,30 @@
                         [value]="consulting.averageScore"
                         [showValue]="false"
                       ></p-progressBar>
+                    </div>
+                  }
+
+                  <!-- Report Actions for Finished consultations -->
+                  @if (consulting.statusCons === 1) {
+                    <div class="card-report-actions">
+                      <p-button
+                        icon="pi pi-eye"
+                        label="Ver informe"
+                        [outlined]="true"
+                        size="small"
+                        severity="success"
+                        (onClick)="generateReport(consulting.id, $event)"
+                      >
+                      </p-button>
+                      <p-button
+                        icon="pi pi-send"
+                        label="Enviar informe"
+                        [outlined]="true"
+                        size="small"
+                        severity="info"
+                        (onClick)="openEmailDialog(consulting.id, $event)"
+                      >
+                      </p-button>
                     </div>
                   }
 
@@ -153,6 +186,7 @@
                 </div>
               }
 
+              <!-- Create New Card (only on last page) -->
               @if (isLastPage) {
                 <div class="consulting-card-new" (click)="consultation()">
                   <div class="new-card-icon">
@@ -163,6 +197,7 @@
               }
             </div>
 
+            <!-- Pagination -->
             <div class="pagination-container">
               <p-paginator
                 [rows]="rowsPerPage"
@@ -173,6 +208,7 @@
               </p-paginator>
             </div>
           } @else {
+            <!-- Empty State -->
             <div class="empty-state">
               <i class="pi pi-inbox"></i>
               <h3>No se encontraron consultorías</h3>
@@ -184,11 +220,13 @@
     </section>
   </main>
 
+  <!-- Footer -->
   <footer class="home-footer">
     <p>© 2026 ConsultorIA. Todos los derechos reservados.</p>
   </footer>
 </div>
 
+<!-- Title Dialog Modal -->
 <app-generic-dialog
   [(visible)]="showTitleDialog"
   [title]="getDialogTitle()"
@@ -206,6 +244,7 @@
   (onHide)="handleCancel()"
 />
 
+<!-- Delete Confirmation Dialog Modal -->
 <app-generic-dialog
   [(visible)]="showDeleteDialog"
   [title]="'Eliminar Consultoría'"
@@ -216,3 +255,6 @@
   styleClass="delete-confirmation-dialog"
   (onHide)="cancelDelete()"
 />
+
+<!-- Email Dialog Component -->
+<app-send-report-email />
