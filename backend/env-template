@@ -9,7 +9,7 @@ JWT_SECRET=a_jwt_secret_key
 # Server Configuration
 PORT=3000
 
-GROQ_API_KEY=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
+GROQ_API_KEY=**
 # Email Configuration
 EMAIL_HOST=smtp.ethereal.email
 EMAIL_PORT=587
