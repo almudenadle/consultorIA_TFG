@@ -107,10 +107,10 @@ export class ReportController {
       );
 
       if (!report) {
-        resp.code = 204;
+        resp.code = 404;
         resp.msg = "Report not found for this consulting session";
         resp.data = null;
-        res.status(200).json(resp);
+        res.status(404).json(resp);
         return;
       }
 
