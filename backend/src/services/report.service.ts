@@ -51,23 +51,7 @@ export class ReportService {
   private static readonly MAX_RETRIES = 3;
   private static readonly RETRY_DELAY_MS = 2000;
 
-  /**
-   * Generates a comprehensive consulting report using OpenAI Assistant.
-   *
-   * This method:
-   * 1. Validates user access and consulting readiness
-   * 2. Builds a detailed context from all collected data
-   * 3. Requests a structured proposal from the AI assistant
-   * 4. Validates the response using Zod schemas
-   * 5. Persists the report to the database
-   * 6. Updates the consulting status to COMPLETED
-   *
-   * @param consultingId - The ID of the consulting session to generate a report for
-   * @param userId - The authenticated user's ID (for access validation)
-   * @returns A structured report containing summary, proposal, recommendations, and impact analysis
-   * @throws {Error} If consulting not found, access denied, or AI processing fails
-   */
-  public static async generateReport(
+public static async generateReport(
     consultingId: number,
     userId: number,
   ): Promise<IReportToSend> {
@@ -97,21 +81,14 @@ export class ReportService {
         throw new Error("Report already exists for this consulting session");
       }
 
-      if (!consulting.threadID) {
-        throw new Error(
-          "Consulting thread not initialized. Cannot generate report.",
-        );
-      }
-
       console.log("[REPORT GENERATION] Consulting snapshot", {
         consultingId: consulting.id,
-        threadID: consulting.threadID,
         areas: consulting.areas?.length ?? 0,
         forms: consulting.forms?.length ?? 0,
         existingReport: Boolean(consulting.report),
       });
 
-      // Build comprehensive context for the AI
+      // Build comprehensive context for the AI from the database summaries
       const contextPrompt = this.buildReportContext(consulting);
 
       console.log("[REPORT GENERATION] Prompt prepared", {
@@ -120,11 +97,8 @@ export class ReportService {
         areaCount: consulting.areas?.length ?? 0,
       });
 
-      // Request proposal from OpenAI Assistant with retries
-      const proposalResponse = await this.requestProposalFromAI(
-        consulting.threadID,
-        contextPrompt,
-      );
+      // Request proposal from Groq Chat Completions with retries
+      const proposalResponse = await this.requestProposalFromAI(contextPrompt);
 
       // Create and save the report entity (without recommendations)
       const report = this.reportRepo.create({
@@ -179,7 +153,6 @@ export class ReportService {
         reportId: savedReport.id,
         summary: proposalResponse.summary,
         proposal: proposalResponse.proposal,
-        // Return to frontend but never displayed there.
         conclusion: proposalResponse.conclusion,
         keyRecommendations: savedRecommendations,
         estimatedImpact: proposalResponse.estimatedImpact,
@@ -190,7 +163,6 @@ export class ReportService {
       throw error;
     }
   }
-
   /**
    * Builds a comprehensive context prompt for the AI assistant.
    * Includes company info, detected areas, KPI data, and all user responses.
@@ -232,7 +204,7 @@ export class ReportService {
    *
    * @param consulting - The consulting entity with areas loaded
    */
-  private static async generateAndSaveAreaProposals(
+public static async generateAndSaveAreaProposals(
     consulting: Consulting,
   ): Promise<void> {
     if (!consulting.areas || consulting.areas.length === 0) {
@@ -245,38 +217,31 @@ export class ReportService {
     try {
       const allAreasPrompt = this.buildAllAreasProposalPrompt(consulting.areas);
 
-      // Add message to existing thread to preserve full context
-      await groq.beta.threads.messages.create(consulting.threadID!, {
-        role: "user",
-        content: allAreasPrompt,
+      const completion = await groq.chat.completions.create({
+        model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
+        max_completion_tokens:
+          Number(process.env.GROQ_MAX_COMPLETION_TOKENS) || 4096,
+        messages: [
+          {
+            role: "user",
+            content: allAreasPrompt,
+          },
+        ],
+        response_format: allAreasProposalResponseFormat,
       });
 
-      const run = await groq.beta.threads.runs.createAndPoll(
-        consulting.threadID!,
-        {
-          assistant_id: process.env.ASSISTANT_QUESTIONS_ID!,
-          response_format: allAreasProposalResponseFormat,
-        },
-        { pollIntervalMs: 500 },
-      );
-
-      if (run.status !== "completed") {
-        throw new Error(
-          `All areas proposal run failed: ${run.status}. Reason: ${run.last_error?.message || "Unknown"}`,
-        );
+      const rawContent = completion.choices[0]?.message?.content;
+      if (!rawContent) {
+        throw new Error("No text response from Groq for area proposals");
       }
 
-      const messages = await groq.beta.threads.messages.list(
-        consulting.threadID!,
-        { limit: 1 },
-      );
-      const lastMessage = messages.data[0];
+      const cleanContent = rawContent
+        .replace(/^```json\s*/i, "")
+        .replace(/^```\s*/i, "")
+        .replace(/\s*```$/, "")
+        .trim();
 
-      if (!lastMessage || lastMessage.content[0].type !== "text") {
-        throw new Error("Invalid response format from assistant");
-      }
-
-      const jsonResponse = JSON.parse(lastMessage.content[0].text.value);
+      const jsonResponse = JSON.parse(cleanContent);
       const validated: AllAreasProposalResponse =
         AllAreasProposalSchema.parse(jsonResponse);
 
@@ -292,12 +257,12 @@ export class ReportService {
             { proposal: proposalData.proposal },
           );
         } else {
-          throw Error(`No area found for the matching area: ${matchingArea}`);
+          throw Error(`No area found for the matching area ID: ${proposalData.areaId}`);
         }
       }
     } catch (err) {
       console.error("Error generating proposals for all areas:", err);
-      throw err; // Propagate error to calling method
+      throw err;
     }
   }
 
@@ -352,76 +317,52 @@ export class ReportService {
    * @returns Validated proposal response from the AI
    * @throws {Error} If maximum retries exceeded or validation fails
    */
-  private static async requestProposalFromAI(
-    threadId: string,
+ private static async requestProposalFromAI(
     contextPrompt: string,
   ): Promise<ProposalResponse> {
     const groq = GroqClient.getInstance();
     let attempts = 0;
 
     console.log("[REPORT AI] Starting proposal request", {
-      threadId,
       promptLength: contextPrompt.length,
       maxRetries: this.MAX_RETRIES,
     });
 
     while (attempts < this.MAX_RETRIES) {
       try {
-        console.log("[REPORT AI] Attempting proposal run", {
-          threadId,
+        console.log("[REPORT AI] Attempting proposal chat completion", {
           attempt: attempts + 1,
         });
 
-        // Add the proposal request message to the thread
-        await groq.beta.threads.messages.create(threadId, {
-          role: "user",
-          content: contextPrompt,
+        const completion = await groq.chat.completions.create({
+          model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
+          max_completion_tokens:
+            Number(process.env.GROQ_MAX_COMPLETION_TOKENS) || 4096,
+          messages: [
+            {
+              role: "user",
+              content: contextPrompt,
+            },
+          ],
+          response_format: proposalResponseFormat,
         });
 
-        // Run the assistant with the proposal response format
-        const run = await groq.beta.threads.runs.createAndPoll(
-          threadId,
-          {
-            assistant_id: process.env.ASSISTANT_QUESTIONS_ID!,
-            response_format: proposalResponseFormat,
-          },
-          { pollIntervalMs: 500 },
-        );
-
-        if (run.status !== "completed") {
-          console.log("[REPORT AI] Run finished without completion", {
-            threadId,
-            attempt: attempts + 1,
-            status: run.status,
-            lastError: run.last_error?.message || null,
-          });
-          throw new Error(
-            `Assistant run failed with status: ${run.status}. Reason: ${run.last_error?.message || "Unknown"}`,
-          );
+        const rawContent = completion.choices[0]?.message?.content;
+        if (!rawContent) {
+          throw new Error("No text response from Groq");
         }
 
-        // Retrieve the latest message
-        const messages = await groq.beta.threads.messages.list(threadId, {
-          limit: 1,
-        });
+        // Clean content if it includes markdown codeblock markers
+        const cleanContent = rawContent
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/\s*```$/, "")
+          .trim();
 
-        const lastMessage = messages.data[0];
-
-        if (!lastMessage || lastMessage.content[0].type !== "text") {
-          console.log("[REPORT AI] Invalid assistant message format", {
-            threadId,
-            attempt: attempts + 1,
-            messageType: lastMessage?.content?.[0]?.type ?? null,
-          });
-          throw new Error("Invalid message format received from assistant");
-        }
-
-        // Parse and validate the JSON response
-        const jsonResponse = JSON.parse(lastMessage.content[0].text.value);
+        const jsonResponse = JSON.parse(cleanContent);
         const validatedResponse = ProposalSchema.parse(jsonResponse);
 
         console.log("[REPORT AI] Proposal validated", {
-          threadId,
           attempt: attempts + 1,
           keyRecommendations: validatedResponse.keyRecommendations.length,
         });
@@ -433,13 +374,6 @@ export class ReportService {
           `Attempt ${attempts}/${this.MAX_RETRIES} failed:`,
           error instanceof Error ? error.message : error,
         );
-
-        if (attempts >= this.MAX_RETRIES) {
-          console.error("[REPORT AI] All retries exhausted", {
-            threadId,
-            promptLength: contextPrompt.length,
-          });
-        }
 
         if (attempts >= this.MAX_RETRIES) {
           throw new Error(
@@ -455,7 +389,7 @@ export class ReportService {
     }
 
     throw new Error("Unexpected error in proposal generation");
-  }
+  } 
 
   /**
    * Utility function to pause execution for a specified duration.
