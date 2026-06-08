@@ -446,7 +446,7 @@ onSubmit(): void {
             this.formGroup = undefined;
             
             this.cdr.detectChanges(); // Forzar actualización visual del spinner
-            
+            console.log('🛑 [PROPOSAL] consultingID at trigger time:', this.consultingID);
             this.generateProposal();
             return;
           }
