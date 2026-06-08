@@ -9,6 +9,7 @@ JWT_SECRET=a_jwt_secret_key
 # Server Configuration
 PORT=3000
 
+GROQ_MODEL
 GROQ_API_KEY
 
 # Email Configuration
