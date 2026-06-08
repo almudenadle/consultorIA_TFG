@@ -1,7 +1,7 @@
 # Database Configuration
 DB_HOST=dpg-d8b2vu6q1p3s73dqfbu0-a
 DB_USER=consultoria_gr9d_user
-DB_PASS=a8WpCmJpvOn4PxMAHpCv0oyL4mi6v5Rf
+DB_PASS=***
 DB_NAME=consultoria_gr9d
 DB_PORT=5432
 
@@ -9,7 +9,8 @@ JWT_SECRET=a_jwt_secret_key
 # Server Configuration
 PORT=3000
 
-GROQ_API_KEY=
+GROQ_API_KEY
+
 # Email Configuration
 EMAIL_HOST=smtp.ethereal.email
 EMAIL_PORT=587
