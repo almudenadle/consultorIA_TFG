@@ -434,26 +434,50 @@ onSubmit(): void {
           // EVALUAR CONDICIÓN DE REPORTE:
           console.log('🛑 [PROPOSAL] shouldGenerateProposal:', nextForm.shouldGenerateProposal);
           console.log('🛑 [PROPOSAL] arrayCampos:', arrayCampos);
-          if (nextForm.shouldGenerateProposal === true) {
-            
-            if (nextForm.allAreas || nextForm.currentArea || nextForm.assistantMessage) {
-              this.consultationDataUpdated.emit({
-                isProposalPhase: true,
-                currentArea: nextForm.currentArea || undefined,
-                allAreas: nextForm.allAreas || [],
-                meanVelocity: nextForm.meanVelocity,
-              });
-            }
+      //   if (nextForm.shouldGenerateProposal === true && arrayCampos.length === 0) {
+         if (nextForm.shouldGenerateProposal) {
 
-            this.isGeneratingProposal.set(true);
-            this.questions = [];
-            this.formGroup = undefined;
-            
-            this.cdr.detectChanges(); // Forzar actualización visual del spinner
-            console.log('🛑 [PROPOSAL] consultingID at trigger time:', this.consultingID);
-            this.generateProposal();
-            return;
-          }
+  // ✅ FIX 1: Save current form to history before clearing
+  if (this.questions && this.questions.length > 0 && this.formGroup) {
+    const currentValues = this.formGroup.getRawValue();
+    this.submittedForms.update(forms => [
+      ...forms,
+      {
+        fields: this.questions!,
+        values: currentValues,
+        areaName: this.currentAreaName,
+      }
+    ]);
+  }
+const resolvedId = parseInt(nextForm.consultingId, 10);
+if (!isNaN(resolvedId) && resolvedId > 0) {
+  this.consultingID = resolvedId;
+}
+
+  if (!this.consultingID || this.consultingID <= 0) {
+    this.errorService.showError('No se pudo determinar el ID de la consultoría para generar el informe.');
+    this.isGeneratingProposal.set(false);
+    return;
+  }
+
+  if (nextForm.allAreas || nextForm.currentArea || nextForm.assistantMessage) {
+    this.consultationDataUpdated.emit({
+      isProposalPhase: true,
+      currentArea: nextForm.currentArea || undefined,
+      allAreas: nextForm.allAreas || [],
+      meanVelocity: nextForm.meanVelocity,
+    });
+  }
+
+  this.isGeneratingProposal.set(true);
+  this.questions = [];
+  this.formGroup = undefined;
+  this.emitFormIndex(); // ✅ FIX 3: Update index to remove active form entry
+
+  this.cdr.detectChanges();
+  this.generateProposal();
+  return;
+}
 
           // SI NO ES FASE DE REPORTE: Continúa normal
           this.formID = parseInt(nextForm.formId || nextForm.formID, 10);
@@ -534,12 +558,14 @@ onSubmit(): void {
   }
 
   private generateProposal(): void {
-    if (!this.consultingID || this.consultingID === -1) {
-      this.errorMessage.set('Missing consultation ID');
-      this.isGeneratingProposal.set(false);
-      return;
-    }
-
+// AFTER — also surfaces the error visibly
+if (!this.consultingID || this.consultingID <= 0) {
+  const msg = 'No se pudo determinar el ID de consultoría para generar el informe.';
+  this.errorService.showError(msg);
+  this.errorMessage.set(msg);
+  this.isGeneratingProposal.set(false);
+  return;
+}
     console.log('[FRONTEND REPORT REQUEST]', {
       consultingId: this.consultingID,
       isGeneratingProposal: this.isGeneratingProposal(),
