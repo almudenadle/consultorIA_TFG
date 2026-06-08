@@ -69,13 +69,13 @@
       "validators": [
         {
           "type": "minLength",
-          "value": 20,
-          "message": "La descripción debe tener como mínimo 20 caracteres"
+          "value": 15,
+          "message": "La descripción debe tener como mínimo 15 caracteres"
         },
         {
           "type": "maxLength",
-          "value": 20,
-          "message": "La descripción no puede superar los 20 caracteres"
+          "value": 30,
+          "message": "La descripción no puede superar los 30 caracteres"
         }
       ]
     }

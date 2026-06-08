@@ -124,6 +124,12 @@ The `name` of an `AreaDetectedSchema` must be in Spanish. It must be specific. D
   - Use for **Categories**.
   - *Validation:* Set `validators` to `null`.
 
+- **Schema completeness rule (MANDATORY):**
+  - Every question object MUST include the `options` field.
+  - For `select` and `multiselect`, `options` must be a non-empty array of strings.
+  - For `textarea`, `options` must be explicitly set to `null`.
+  - Never omit `options` from the JSON output, even when it does not apply.
+
 - **`multiselect` (Multiple Selection):**
   - Use when the user can have **multiple valid answers simultaneously**.
   - **Recommended use cases:**
