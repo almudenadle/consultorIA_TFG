@@ -375,6 +375,7 @@ onSubmit(): void {
       return;
     }
 
+    console.log('🛑 [DEBUG FRONTEND] Submitting form with values:', this.formGroup.value);
     if (this.isFirstForm) {
       if (this.consultingID !== -1 || this.formID !== -1) {
         this.errorMessage.set('Invalid IDs for first form submission');
