@@ -345,8 +345,7 @@ public static async generateAndSaveAreaProposals(
 
       const cleanContent = rawContent
         .replace(/^```json\s*/i, "")
-        .replace(/^
-```\s*/i, "")
+        .replace(/^```\s*/i, "")
         .replace(/\s*```$/, "")
         .trim();
 
