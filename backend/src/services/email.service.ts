@@ -27,14 +27,12 @@ export class EmailService {
       const transporter = nodemailer.createTransport({
         host: process.env.EMAIL_HOST || "smtp.ethereal.email",
         port: parseInt(process.env.EMAIL_PORT || "587"),
-        secure: false,
+        secure: true,
         auth: {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PSSWD,
         },
-        tls: {
-    rejectUnauthorized: false 
-  },
+
       });
 
       // Send email with PDF attachment
