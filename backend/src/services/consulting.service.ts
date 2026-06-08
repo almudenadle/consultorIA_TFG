@@ -234,6 +234,16 @@ export class ConsultingService {
         generateProposal = true;
       }
 
+      console.log("[REPORT TRIGGER CHECK]", {
+        consultingId: data.consultingID,
+        numQuestionsAns,
+        maxQuestions: this.MAX_NUM_QUESTIONS,
+        limitQuestionsReached,
+        hasPendingAreas,
+        questionsReturned: questionsToSend.length,
+        generateProposal,
+      });
+
       let responseToForm = await FormParser.parseAgentResponseToForm(
         {
           questions: questionsToSend,
@@ -270,6 +280,9 @@ export class ConsultingService {
       }));
 
       if (generateProposal) {
+        console.log(
+          `[REPORT TRIGGER] Activating proposal phase for consulting ${data.consultingID} after ${numQuestionsAns} questions`,
+        );
         responseToForm.questions = [];
         responseToForm.shouldGenerateProposal = true;
       }
