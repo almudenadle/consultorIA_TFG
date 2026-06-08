@@ -318,78 +318,71 @@ public static async generateAndSaveAreaProposals(
    * @throws {Error} If maximum retries exceeded or validation fails
    */
  private static async requestProposalFromAI(
-    contextPrompt: string,
-  ): Promise<ProposalResponse> {
-    const groq = GroqClient.getInstance();
-    let attempts = 0;
+  contextPrompt: string,
+): Promise<ProposalResponse> {
+  const groq = GroqClient.getInstance();
+  let attempts = 0;
+  const startTime = Date.now();
 
-    console.log("[REPORT AI] Starting proposal request", {
-      promptLength: contextPrompt.length,
-      maxRetries: this.MAX_RETRIES,
-    });
+  console.log("[DEBUG REPORTE] Iniciando solicitud de reporte en Groq.");
 
-    while (attempts < this.MAX_RETRIES) {
+  while (attempts < this.MAX_RETRIES) {
+    try {
+      const attemptStart = Date.now();
+      
+      const completion = await groq.chat.completions.create({
+        model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
+        max_completion_tokens: Number(process.env.GROQ_MAX_COMPLETION_TOKENS) || 4096,
+        messages: [{ role: "user", content: contextPrompt }],
+        response_format: proposalResponseFormat,
+      });
+
+      console.log(`[DEBUG REPORTE] Tiempo de respuesta de Groq (Intento ${attempts + 1}): ${(Date.now() - attemptStart) / 1000}s`);
+      console.log("[DEBUG REPORTE] Motivo de finalización de Groq:", completion.choices[0]?.finish_reason);
+
+      const rawContent = completion.choices[0]?.message?.content;
+      if (!rawContent) throw new Error("No text response from Groq");
+
+      const cleanContent = rawContent
+        .replace(/^```json\s*/i, "")
+        .replace(/^
+```\s*/i, "")
+        .replace(/\s*```$/, "")
+        .trim();
+
+      // Verificar si el JSON se parsea correctamente antes de enviarlo a Zod
+      let jsonResponse;
       try {
-        console.log("[REPORT AI] Attempting proposal chat completion", {
-          attempt: attempts + 1,
-        });
-
-        const completion = await groq.chat.completions.create({
-          model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
-          max_completion_tokens:
-            Number(process.env.GROQ_MAX_COMPLETION_TOKENS) || 4096,
-          messages: [
-            {
-              role: "user",
-              content: contextPrompt,
-            },
-          ],
-          response_format: proposalResponseFormat,
-        });
-
-        const rawContent = completion.choices[0]?.message?.content;
-        if (!rawContent) {
-          throw new Error("No text response from Groq");
-        }
-
-        // Clean content if it includes markdown codeblock markers
-        const cleanContent = rawContent
-          .replace(/^```json\s*/i, "")
-          .replace(/^```\s*/i, "")
-          .replace(/\s*```$/, "")
-          .trim();
-
-        const jsonResponse = JSON.parse(cleanContent);
-        const validatedResponse = ProposalSchema.parse(jsonResponse);
-
-        console.log("[REPORT AI] Proposal validated", {
-          attempt: attempts + 1,
-          keyRecommendations: validatedResponse.keyRecommendations.length,
-        });
-
-        return validatedResponse;
-      } catch (error) {
-        attempts++;
-        console.error(
-          `Attempt ${attempts}/${this.MAX_RETRIES} failed:`,
-          error instanceof Error ? error.message : error,
-        );
-
-        if (attempts >= this.MAX_RETRIES) {
-          throw new Error(
-            `Failed to generate proposal after ${this.MAX_RETRIES} attempts. Last error: ${
-              error instanceof Error ? error.message : "Unknown error"
-            }`,
-          );
-        }
-
-        // Wait before retrying
-        await this.sleep(this.RETRY_DELAY_MS);
+        jsonResponse = JSON.parse(cleanContent);
+      } catch (jsonErr: any) {
+        console.error("[DEBUG REPORTE] El JSON de Groq vino defectuoso o incompleto (posible truncamiento de tokens).");
+        console.error("[DEBUG REPORTE] Contenido recibido truncado:", cleanContent.substring(cleanContent.length - 200));
+        throw jsonErr;
       }
-    }
 
-    throw new Error("Unexpected error in proposal generation");
-  } 
+      // Validar con Zod
+      try {
+        const validatedResponse = ProposalSchema.parse(jsonResponse);
+        console.log(`[DEBUG REPORTE] Reporte generado con éxito en ${(Date.now() - startTime) / 1000}s totales.`);
+        return validatedResponse;
+      } catch (zodErr: any) {
+        console.error("[DEBUG REPORTE] Error de validación en el Schema de Zod (ProposalSchema):", zodErr.errors || zodErr);
+        throw zodErr;
+      }
+
+    } catch (error: any) {
+      attempts++;
+      console.error(`[DEBUG REPORTE] Intento ${attempts} fallido. Error general:`, error.message);
+
+      if (attempts >= this.MAX_RETRIES) {
+        throw new Error(`Failed to generate proposal after ${this.MAX_RETRIES} attempts.`);
+      }
+      await this.sleep(this.RETRY_DELAY_MS);
+    }
+  }
+
+  throw new Error("Unexpected error in proposal generation");
+}
 
   /**
    * Utility function to pause execution for a specified duration.
