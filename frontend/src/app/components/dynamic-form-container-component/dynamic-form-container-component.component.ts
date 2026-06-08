@@ -430,6 +430,8 @@ onSubmit(): void {
           const arrayCampos = nextForm.questions || nextForm.fields || [];
 
           // EVALUAR CONDICIÓN DE REPORTE:
+          console.log('🛑 [PROPOSAL] shouldGenerateProposal:', nextForm.shouldGenerateProposal);
+          console.log('🛑 [PROPOSAL] arrayCampos:', arrayCampos);
           if (nextForm.shouldGenerateProposal === true && arrayCampos.length === 0) {
             
             if (nextForm.allAreas || nextForm.currentArea || nextForm.assistantMessage) {
