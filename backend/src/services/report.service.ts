@@ -72,6 +72,11 @@ export class ReportService {
     userId: number,
   ): Promise<IReportToSend> {
     try {
+      console.log("[REPORT GENERATION] Starting report generation", {
+        consultingId,
+        userId,
+      });
+
       // Fetch consulting with all related data
       const consulting = await this.consultingRepo.findOne({
         where: { id: consultingId },
@@ -98,8 +103,22 @@ export class ReportService {
         );
       }
 
+      console.log("[REPORT GENERATION] Consulting snapshot", {
+        consultingId: consulting.id,
+        threadID: consulting.threadID,
+        areas: consulting.areas?.length ?? 0,
+        forms: consulting.forms?.length ?? 0,
+        existingReport: Boolean(consulting.report),
+      });
+
       // Build comprehensive context for the AI
       const contextPrompt = this.buildReportContext(consulting);
+
+      console.log("[REPORT GENERATION] Prompt prepared", {
+        consultingId,
+        promptLength: contextPrompt.length,
+        areaCount: consulting.areas?.length ?? 0,
+      });
 
       // Request proposal from OpenAI Assistant with retries
       const proposalResponse = await this.requestProposalFromAI(
@@ -119,6 +138,11 @@ export class ReportService {
 
       const savedReport = await this.reportRepo.save(report);
 
+      console.log("[REPORT GENERATION] Report persisted", {
+        consultingId,
+        reportId: savedReport.id,
+      });
+
       // Persist each key recommendation as an independent record
       const savedRecommendations: IKeyRecommendation[] = [];
       for (const rec of proposalResponse.keyRecommendations) {
@@ -137,6 +161,12 @@ export class ReportService {
           reportId: savedRec.reportId,
         });
       }
+
+      console.log("[REPORT GENERATION] Key recommendations persisted", {
+        consultingId,
+        reportId: savedReport.id,
+        count: savedRecommendations.length,
+      });
 
       // Update consulting status to FINISHED
       await this.consultingRepo.update(
@@ -329,8 +359,19 @@ export class ReportService {
     const groq = GroqClient.getInstance();
     let attempts = 0;
 
+    console.log("[REPORT AI] Starting proposal request", {
+      threadId,
+      promptLength: contextPrompt.length,
+      maxRetries: this.MAX_RETRIES,
+    });
+
     while (attempts < this.MAX_RETRIES) {
       try {
+        console.log("[REPORT AI] Attempting proposal run", {
+          threadId,
+          attempt: attempts + 1,
+        });
+
         // Add the proposal request message to the thread
         await groq.beta.threads.messages.create(threadId, {
           role: "user",
@@ -348,6 +389,12 @@ export class ReportService {
         );
 
         if (run.status !== "completed") {
+          console.log("[REPORT AI] Run finished without completion", {
+            threadId,
+            attempt: attempts + 1,
+            status: run.status,
+            lastError: run.last_error?.message || null,
+          });
           throw new Error(
             `Assistant run failed with status: ${run.status}. Reason: ${run.last_error?.message || "Unknown"}`,
           );
@@ -361,12 +408,23 @@ export class ReportService {
         const lastMessage = messages.data[0];
 
         if (!lastMessage || lastMessage.content[0].type !== "text") {
+          console.log("[REPORT AI] Invalid assistant message format", {
+            threadId,
+            attempt: attempts + 1,
+            messageType: lastMessage?.content?.[0]?.type ?? null,
+          });
           throw new Error("Invalid message format received from assistant");
         }
 
         // Parse and validate the JSON response
         const jsonResponse = JSON.parse(lastMessage.content[0].text.value);
         const validatedResponse = ProposalSchema.parse(jsonResponse);
+
+        console.log("[REPORT AI] Proposal validated", {
+          threadId,
+          attempt: attempts + 1,
+          keyRecommendations: validatedResponse.keyRecommendations.length,
+        });
 
         return validatedResponse;
       } catch (error) {
@@ -375,6 +433,13 @@ export class ReportService {
           `Attempt ${attempts}/${this.MAX_RETRIES} failed:`,
           error instanceof Error ? error.message : error,
         );
+
+        if (attempts >= this.MAX_RETRIES) {
+          console.error("[REPORT AI] All retries exhausted", {
+            threadId,
+            promptLength: contextPrompt.length,
+          });
+        }
 
         if (attempts >= this.MAX_RETRIES) {
           throw new Error(
