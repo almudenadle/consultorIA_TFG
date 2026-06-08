@@ -473,7 +473,7 @@ export class DynamicFormContainerComponent implements OnInit {
           }
 
           // End the consultation flow when AI returns no further questions.
-          if (nextForm.shouldGenerateProposal && nextForm.fields.length === 0) {
+          if (nextForm.shouldGenerateProposal) {
             if (
               nextForm.allAreas ||
               nextForm.currentArea ||
