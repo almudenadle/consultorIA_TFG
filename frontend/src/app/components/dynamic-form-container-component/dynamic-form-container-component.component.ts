@@ -432,7 +432,7 @@ onSubmit(): void {
           // EVALUAR CONDICIÓN DE REPORTE:
           console.log('🛑 [PROPOSAL] shouldGenerateProposal:', nextForm.shouldGenerateProposal);
           console.log('🛑 [PROPOSAL] arrayCampos:', arrayCampos);
-          if (nextForm.shouldGenerateProposal === true && arrayCampos.length === 0) {
+          if (nextForm.shouldGenerateProposal === true) {
             
             if (nextForm.allAreas || nextForm.currentArea || nextForm.assistantMessage) {
               this.consultationDataUpdated.emit({
