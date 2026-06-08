@@ -24,12 +24,11 @@ import { TagModule } from 'primeng/tag';
 
 // Components
 import { DynamicFormQuestionComponent } from '../dynamic-form-question/dynamic-form-question.component';
-import { ConsultingProposalComponent } from '../consulting-proposal/consulting-proposal.component';
 
 // Services
+import { ReportService } from '../../services/report.service';
 import { DynamicFormService } from '../../services/dynamic_form.service';
 import { ConsultingService } from '../../services/consulting.service';
-import { ReportService } from '../../services/report.service';
 import { AuthService } from '../../services/auth.service';
 import { AreaColorService } from '../../services/area-color.service';
 import { ErrorService } from '../../services/error.service';
@@ -44,6 +43,8 @@ import {
 import { IConsultingProposal } from '../../interface/consulting.proposal.interface';
 import { IKPIArea } from '../../interface/kpi_areas.interface';
 import { IFormIndexEntry } from '../../interface/form_index.interface';
+
+import { ConsultingProposalComponent } from '../consulting-proposal/consulting-proposal.component';
 
 /**
  * Container component that orchestrates the dynamic form rendering and submission.
@@ -76,10 +77,10 @@ export class DynamicFormContainerComponent implements OnInit {
   // Services injection
   private dynamicFormService = inject(DynamicFormService);
   private consultingService = inject(ConsultingService);
-  private reportService = inject(ReportService);
   private authService = inject(AuthService);
   private location = inject(Location);
   private cdr = inject(ChangeDetectorRef);
+  private reportService = inject(ReportService);
   private areaColorService = inject(AreaColorService);
   private errorService = inject(ErrorService);
 
@@ -121,6 +122,8 @@ export class DynamicFormContainerComponent implements OnInit {
   isSubmitting = signal<boolean>(false);
   isGeneratingProposal = signal<boolean>(false);
   errorMessage = signal<string | undefined>(undefined);
+
+  // Proposal state
   showProposal = signal<boolean>(false);
   proposalData = signal<IConsultingProposal | undefined>(undefined);
 
@@ -262,8 +265,26 @@ export class DynamicFormContainerComponent implements OnInit {
 
         this.scrollToLastFormAndFocus();
 
-        this.loadProposalIfAvailable(consultingId);
-
+        // After emiting areas, check if there is a proposal
+        if (this.reportService.getReportByConsultingId(consultingId)) {
+          this.showProposal.set(true);
+          this.reportService.getReportByConsultingId(consultingId).subscribe({
+            next: (proposal) => {
+              if (proposal) {
+                this.proposalData.set(proposal);
+                this.consultationDataUpdated.emit({
+                  isProposalPhase: true,
+                });
+                this.scrollToProposal();
+              }
+            },
+            error: (err) => {
+              this.errorService.showError(
+                err.message || 'Error al obtener propuesta',
+              );
+            },
+          });
+        }
       },
       error: (error) => {
         const errorMsg = error.message || 'Error loading consultation';
@@ -316,7 +337,6 @@ export class DynamicFormContainerComponent implements OnInit {
    * Creates a new consultation
    */
   private createNewConsultation(): void {
-    console.log('🛑 [DEBUG FRONTEND] Creating new consultation')  ;
     const userID = this.authService.getNumUserIdFromToken();
 
     if (!userID) {
@@ -371,40 +391,47 @@ export class DynamicFormContainerComponent implements OnInit {
    * Extracts form values, sends to backend, and loads next form.
    * If this is the first form submission, creates the consulting session.
    */
-onSubmit(): void {
+  onSubmit(): void {
     if (!this.formGroup || !this.formGroup.valid) {
       return;
     }
 
-    console.log('🛑 [DEBUG FRONTEND] Submitting form with values:', this.formGroup.value);
+    // Validate IDs based on whether this is the first form
     if (this.isFirstForm) {
+      // For first form, IDs must be -1
       if (this.consultingID !== -1 || this.formID !== -1) {
         this.errorMessage.set('Invalid IDs for first form submission');
         return;
       }
     } else {
+      // For subsequent forms, IDs must exist and be valid
       if (this.consultingID === undefined || this.formID === undefined) {
         this.errorMessage.set('Missing consultation or form ID');
         return;
       }
     }
 
+    // Extract form values
     const formResponse: IFormResponse = this.dynamicFormService.getFormValues(
       this.formGroup,
       this.formID!.toString(),
       this.consultingID!.toString(),
     );
 
+    // Submit to backend
     this.isSubmitting.set(true);
     this.errorMessage.set(undefined);
 
+    // Include title in first submission
     let titleToSend: string | undefined = undefined;
 
     if (this.isFirstForm) {
       if (this.initialTitle?.trim()) {
+        // Use the manually provided title
         titleToSend = this.initialTitle.trim();
         this.hasSetInitialTitle = true;
       } else {
+        // Generate title from first form response
         const firstFieldValue = this.getFirstResponseValue();
         if (firstFieldValue) {
           titleToSend = this.generateTitleFromResponse(firstFieldValue);
@@ -417,76 +444,80 @@ onSubmit(): void {
       .submitFormResponses(formResponse, titleToSend)
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
-        next: (nextForm: any) => {
-          // 🔴 LOG 1: VER EXACTAMENTE QUÉ DEVUELVE EL BACKEND
-          console.log('🛑 [DEBUG FRONTEND] Payload crudo recibido del backend:', nextForm);
-
-         // ...
+        next: (nextForm: IDynamicForm) => {
+          // If this was the first submission, update consultingID and formID
           if (this.isFirstForm) {
+            // Extract the real IDs from the backend response
             this.consultingID = parseInt(nextForm.consultingId, 10);
-            this.formID = parseInt(nextForm.formId || nextForm.formID, 10);
-            this.isFirstForm = false;
+            this.formID = parseInt(nextForm.formId, 10);
+            this.isFirstForm = false; // No longer the first form
           }
 
-          // EXTRAER EL ARRAY CORRECTAMENTE:
-          const arrayCampos = nextForm.questions || nextForm.fields || [];
+          // Save submitted form to history
+          if (this.questions && this.formGroup) {
+            // Trim all values to remove leading/trailing whitespace
+            const trimmedValues: Record<string, any> = {};
+            Object.keys(this.formGroup.value).forEach((key) => {
+              const value = this.formGroup!.value[key];
+              trimmedValues[key] =
+                typeof value === 'string' ? value.trim() : value;
+            });
 
-          // EVALUAR CONDICIÓN DE REPORTE:
-          console.log('🛑 [PROPOSAL] shouldGenerateProposal:', nextForm.shouldGenerateProposal);
-          console.log('🛑 [PROPOSAL] arrayCampos:', arrayCampos);
-      //   if (nextForm.shouldGenerateProposal === true && arrayCampos.length === 0) {
-         if (nextForm.shouldGenerateProposal) {
+            this.submittedForms.update((forms) => [
+              ...forms,
+              {
+                fields: this.questions!,
+                values: trimmedValues,
+                areaName: this.currentAreaName,
+              },
+            ]);
+          }
 
-  // ✅ FIX 1: Save current form to history before clearing
-  if (this.questions && this.questions.length > 0 && this.formGroup) {
-    const currentValues = this.formGroup.getRawValue();
-    this.submittedForms.update(forms => [
-      ...forms,
-      {
-        fields: this.questions!,
-        values: currentValues,
-        areaName: this.currentAreaName,
-      }
-    ]);
-  }
-const resolvedId = parseInt(nextForm.consultingId, 10);
-if (!isNaN(resolvedId) && resolvedId > 0) {
-  this.consultingID = resolvedId;
-}
+          // Update URL after consulting was created (when consultingID is new and valid)
+          if (this.consultingID && this.consultingID !== -1) {
+            const currentPath = this.location.path();
+            const expectedPath = `/consultations/${this.consultingID}`;
+            if (currentPath !== expectedPath) {
+              this.location.replaceState(expectedPath);
+            }
+          }
 
-  if (!this.consultingID || this.consultingID <= 0) {
-    this.errorService.showError('No se pudo determinar el ID de la consultoría para generar el informe.');
-    this.isGeneratingProposal.set(false);
-    return;
-  }
+          // Check if should generate proposal
+          if (nextForm.shouldGenerateProposal && nextForm.fields.length === 0) {
+            // Send areas data before generate proposal.
+            if (
+              nextForm.allAreas ||
+              nextForm.currentArea ||
+              nextForm.assistantMessage
+            ) {
+              this.consultationDataUpdated.emit({
+                isProposalPhase: true,
+                currentArea: nextForm.currentArea || undefined,
+                allAreas: nextForm.allAreas || [],
+                meanVelocity: nextForm.meanVelocity,
+              });
+            }
 
-  if (nextForm.allAreas || nextForm.currentArea || nextForm.assistantMessage) {
-    this.consultationDataUpdated.emit({
-      isProposalPhase: true,
-      currentArea: nextForm.currentArea || undefined,
-      allAreas: nextForm.allAreas || [],
-      meanVelocity: nextForm.meanVelocity,
-    });
-  }
+            this.isGeneratingProposal.set(true);
+            this.questions = [];
+            this.formGroup = undefined;
+            this.generateProposal();
+            return;
+          }
 
-  this.isGeneratingProposal.set(true);
-  this.questions = [];
-  this.formGroup = undefined;
-  this.emitFormIndex(); // ✅ FIX 3: Update index to remove active form entry
-
-  this.cdr.detectChanges();
-  this.generateProposal();
-  return;
-}
-
-          // SI NO ES FASE DE REPORTE: Continúa normal
-          this.formID = parseInt(nextForm.formId || nextForm.formID, 10);
-          this.questions = arrayCampos;
-// ...
+          // Update with next form data
+          this.formID = parseInt(nextForm.formId, 10);
+          this.questions = nextForm.fields;
           this.isFirstForm = false;
-          this.currentAreaName = nextForm.currentArea?.name || 'Sin área asignada';
+          this.currentAreaName =
+            nextForm.currentArea?.name || 'Sin área asignada';
 
-          if (nextForm.currentArea && nextForm.allAreas && nextForm.assistantMessage) {
+          // Emit unified consultation data to parent component
+          if (
+            nextForm.currentArea &&
+            nextForm.allAreas &&
+            nextForm.assistantMessage
+          ) {
             this.consultationDataUpdated.emit({
               assistantMessage: nextForm.assistantMessage,
               currentArea: nextForm.currentArea || undefined,
@@ -495,14 +526,18 @@ if (!isNaN(resolvedId) && resolvedId > 0) {
             });
           }
 
+          // Recreate form with new questions
           this.createForm();
+
+          // Emitir índice actualizado
           this.emitFormIndex();
+
+          // Force change detection
           this.cdr.detectChanges();
+
           this.scrollToLastFormAndFocus();
         },
         error: (err) => {
-          // 🔴 LOG 3: CAPTURAR SI ALGO ROMPE LA EJECUCIÓN (Como un undefined)
-          console.error('🛑 [DEBUG FRONTEND] Error grave procesando el formulario:', err);
           this.errorMessage.set(err.message || 'Error submitting form');
         },
       });
@@ -558,53 +593,25 @@ if (!isNaN(resolvedId) && resolvedId > 0) {
   }
 
   private generateProposal(): void {
-// AFTER — also surfaces the error visibly
-if (!this.consultingID || this.consultingID <= 0) {
-  const msg = 'No se pudo determinar el ID de consultoría para generar el informe.';
-  this.errorService.showError(msg);
-  this.errorMessage.set(msg);
-  this.isGeneratingProposal.set(false);
-  return;
-}
-    console.log('[FRONTEND REPORT REQUEST]', {
-      consultingId: this.consultingID,
-      isGeneratingProposal: this.isGeneratingProposal(),
-    });
+    if (!this.consultingID || this.consultingID === -1) {
+      this.errorMessage.set('Missing consultation ID');
+      this.isGeneratingProposal.set(false);
+      return;
+    }
 
     this.reportService.generateProposal(this.consultingID).subscribe({
       next: (proposal) => {
-        console.log('[FRONTEND REPORT RESPONSE]', {
-          consultingId: this.consultingID,
-          receivedKeys: proposal ? Object.keys(proposal) : [],
-        });
         this.isGeneratingProposal.set(false);
+
+        // Mostrar la propuesta recibida
         this.proposalData.set(proposal);
         this.showProposal.set(true);
-        this.consultationDataUpdated.emit({ isProposalPhase: true });
+
         this.scrollToProposal();
       },
       error: (err) => {
         this.errorMessage.set(err.message || 'Error al generar propuesta');
         this.isGeneratingProposal.set(false);
-      },
-    });
-  }
-
-  private loadProposalIfAvailable(consultingId: number): void {
-    this.reportService.getReportByConsultingId(consultingId).subscribe({
-      next: (proposal) => {
-        if (proposal) {
-          this.proposalData.set(proposal);
-          this.showProposal.set(true);
-          this.consultationDataUpdated.emit({ isProposalPhase: true });
-          this.scrollToProposal();
-        }
-      },
-      error: (err) => {
-        const message = String(err?.message || '');
-        if (!message.includes('Report not found')) {
-          this.errorService.showError(err.message || 'Error al obtener propuesta');
-        }
       },
     });
   }
@@ -783,5 +790,4 @@ if (!this.consultingID || this.consultingID <= 0) {
       }
     }, 400);
   }
-
 }
