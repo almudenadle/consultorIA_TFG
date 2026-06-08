@@ -370,17 +370,11 @@ export class DynamicFormContainerComponent implements OnInit {
    * Extracts form values, sends to backend, and loads next form.
    * If this is the first form submission, creates the consulting session.
    */
- /**
-   * Handles form submission.
-   * Extracts form values, sends to backend, and loads next form.
-   * If this is the first form submission, creates the consulting session.
-   */
-  onSubmit(): void {
+onSubmit(): void {
     if (!this.formGroup || !this.formGroup.valid) {
       return;
     }
 
-    // Validate IDs based on whether this is the first form
     if (this.isFirstForm) {
       if (this.consultingID !== -1 || this.formID !== -1) {
         this.errorMessage.set('Invalid IDs for first form submission');
@@ -393,7 +387,6 @@ export class DynamicFormContainerComponent implements OnInit {
       }
     }
 
-    // Extract form values
     const formResponse: IFormResponse = this.dynamicFormService.getFormValues(
       this.formGroup,
       this.formID!.toString(),
@@ -422,15 +415,16 @@ export class DynamicFormContainerComponent implements OnInit {
       .submitFormResponses(formResponse, titleToSend)
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
-        next: (nextForm: any) => { // Usamos 'any' temporalmente para mapear las propiedades del backend con seguridad
-          
+        next: (nextForm: any) => {
+          // 🔴 LOG 1: VER EXACTAMENTE QUÉ DEVUELVE EL BACKEND
+          console.log('🛑 [DEBUG FRONTEND] Payload crudo recibido del backend:', nextForm);
+
           if (this.isFirstForm) {
             this.consultingID = parseInt(nextForm.consultingId, 10);
-            this.formID = parseInt(nextForm.formId, 10);
+            this.formID = parseInt(nextForm.formId || nextForm.formID, 10);
             this.isFirstForm = false;
           }
 
-          // Save submitted form to history
           if (this.questions && this.formGroup) {
             const trimmedValues: Record<string, any> = {};
             Object.keys(this.formGroup.value).forEach((key) => {
@@ -456,9 +450,18 @@ export class DynamicFormContainerComponent implements OnInit {
             }
           }
 
-          // 🌟 ¡CORRECCIÓN CRÍTICA AQUÍ! 🌟
-          // Validamos usando 'generateProposal' que es el flag que realmente envía tu backend en los logs
-          if (nextForm.generateProposal === true) {
+          // 🔴 EXTRAEMOS LOS CAMPOS DE FORMA SEGURA (Por si se llama fields o questions)
+          const arrayCampos = nextForm.fields || nextForm.questions || [];
+          
+          // 🔴 LOG 2: VERIFICAR LA CONDICIÓN DEL REPORTE
+          console.log('🛑 [DEBUG FRONTEND] Evaluación del reporte:', {
+            shouldGenerateProposal: nextForm.shouldGenerateProposal,
+            cantidadDeCampos: arrayCampos.length
+          });
+
+          // Check if should generate proposal (CÓDIGO ORIGINAL BLINDADO)
+          if (nextForm.shouldGenerateProposal === true && arrayCampos.length === 0) {
+            console.log('🛑 [DEBUG FRONTEND] ¡Condición cumplida! Activando la fase de reporte...');
             
             if (nextForm.allAreas || nextForm.currentArea || nextForm.assistantMessage) {
               this.consultationDataUpdated.emit({
@@ -472,17 +475,15 @@ export class DynamicFormContainerComponent implements OnInit {
             this.isGeneratingProposal.set(true);
             this.questions = [];
             this.formGroup = undefined;
-            
-            // Forzamos el renderizado del spinner en el HTML antes de lanzar la petición pesada
-            this.cdr.detectChanges(); 
-            
             this.generateProposal();
             return;
           }
 
-          // Si no es fase de propuesta, continuamos con el siguiente formulario normal
-          this.formID = parseInt(nextForm.formId, 10);
-          this.questions = nextForm.fields;
+          console.log('🛑 [DEBUG FRONTEND] No se activó el reporte. Cargando el siguiente formulario.');
+
+          // Update with next form data
+          this.formID = parseInt(nextForm.formId || nextForm.formID, 10);
+          this.questions = arrayCampos;
           this.isFirstForm = false;
           this.currentAreaName = nextForm.currentArea?.name || 'Sin área asignada';
 
@@ -501,10 +502,13 @@ export class DynamicFormContainerComponent implements OnInit {
           this.scrollToLastFormAndFocus();
         },
         error: (err) => {
+          // 🔴 LOG 3: CAPTURAR SI ALGO ROMPE LA EJECUCIÓN (Como un undefined)
+          console.error('🛑 [DEBUG FRONTEND] Error grave procesando el formulario:', err);
           this.errorMessage.set(err.message || 'Error submitting form');
         },
       });
   }
+
   private hasNestedOptions(field: IFormField): boolean {
     return field.options != null && Array.isArray(field.options[0]);
   }

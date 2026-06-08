@@ -27,7 +27,7 @@ import { StatusArea } from "../models/enums/kpi_status.enum";
  * Handles consulting creation, prompt generation, structured response parsing, and KPI updates.
  */
 export class ConsultingService {
-  private static readonly MAX_NUM_QUESTIONS = 9;
+  private static readonly MAX_NUM_QUESTIONS = 4;
   private static readonly MAX_NUM_QUESTIONS_PER_FORM = 2;
   private static readonly MIN_SCORE = 8;
   private static readonly AREA_FINISHED = "FINISHED";
@@ -290,6 +290,8 @@ export class ConsultingService {
       responseToForm.currentArea = mappedCurrentArea;
       responseToForm.allAreas = mappedAllAreas;
       responseToForm.meanVelocity = newMeanVelocity;
+
+      console.log("🛑 [DEBUG BACKEND] Payload a enviar al Frontend:", JSON.stringify(responseToForm, null, 2));
 
       return responseToForm;
     } catch (error) {
