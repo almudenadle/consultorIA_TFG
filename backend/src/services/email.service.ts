@@ -35,7 +35,6 @@ export class EmailService {
         tls: {
     rejectUnauthorized: false 
   },
-  connectionTimeout: 10000 // Fail quickly instead of hanging
       });
 
       // Send email with PDF attachment
