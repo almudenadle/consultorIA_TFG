@@ -424,6 +424,17 @@ export class DynamicFormContainerComponent implements OnInit {
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: (nextForm: IDynamicForm) => {
+          console.log('[FRONTEND REPORT GATE]', {
+            consultingId: nextForm.consultingId,
+            formId: nextForm.formId,
+            shouldGenerateProposal: nextForm.shouldGenerateProposal,
+            fieldsLength: nextForm.fields?.length ?? 0,
+            assistantMessage: nextForm.assistantMessage,
+            currentArea: nextForm.currentArea,
+            allAreasCount: nextForm.allAreas?.length ?? 0,
+            meanVelocity: nextForm.meanVelocity,
+          });
+
           // If this was the first submission, update consultingID and formID
           if (this.isFirstForm) {
             // Extract the real IDs from the backend response
@@ -614,8 +625,17 @@ export class DynamicFormContainerComponent implements OnInit {
       return;
     }
 
+    console.log('[FRONTEND REPORT REQUEST]', {
+      consultingId: this.consultingID,
+      isGeneratingProposal: this.isGeneratingProposal(),
+    });
+
     this.reportService.generateProposal(this.consultingID).subscribe({
       next: (proposal) => {
+        console.log('[FRONTEND REPORT RESPONSE]', {
+          consultingId: this.consultingID,
+          receivedKeys: proposal ? Object.keys(proposal) : [],
+        });
         this.isGeneratingProposal.set(false);
         this.proposalData.set(proposal);
         this.showProposal.set(true);
