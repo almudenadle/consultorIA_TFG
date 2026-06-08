@@ -376,64 +376,6 @@ export class ReportService {
           error instanceof Error ? error.message : error,
         );
 
-        // If the error is a tokens/rate limit (413) from the assistant, try once with a truncated prompt
-        const isTokenLimitError = (err: any) => {
-          return (
-            err &&
-            (err.status === 413 ||
-              err.code === "rate_limit_exceeded" ||
-              (err.error && err.error.code === "rate_limit_exceeded"))
-          );
-        };
-
-        if (isTokenLimitError(error)) {
-          try {
-            console.warn("Token limit error detected — retrying with truncated prompt");
-            const truncatedPrompt =
-              contextPrompt.length > 4000
-                ? contextPrompt.slice(0, 4000) + "\n\n(Contenido truncado por límite de tokens.)"
-                : contextPrompt;
-
-            // Add truncated message to the thread
-            await groq.beta.threads.messages.create(threadId, {
-              role: "user",
-              content: truncatedPrompt,
-            });
-
-            const runShort = await groq.beta.threads.runs.createAndPoll(
-              threadId,
-              {
-                assistant_id: process.env.ASSISTANT_QUESTIONS_ID!,
-                response_format: proposalResponseFormat,
-              },
-              { pollIntervalMs: 500 },
-            );
-
-            if (runShort.status !== "completed") {
-              throw new Error(
-                `Assistant run (truncated prompt) failed with status: ${runShort.status}. Reason: ${runShort.last_error?.message || "Unknown"}`,
-              );
-            }
-
-            const messagesShort = await groq.beta.threads.messages.list(threadId, {
-              limit: 1,
-            });
-            const lastMessageShort = messagesShort.data[0];
-
-            if (!lastMessageShort || lastMessageShort.content[0].type !== "text") {
-              throw new Error("Invalid message format received from assistant (truncated)");
-            }
-
-            const jsonResponseShort = JSON.parse(lastMessageShort.content[0].text.value);
-            const validatedShort = ProposalSchema.parse(jsonResponseShort);
-
-            return validatedShort;
-          } catch (innerErr) {
-            console.error("Truncated prompt retry also failed:", innerErr instanceof Error ? innerErr.message : innerErr);
-            // fall through to regular retry logic below
-          }
-        }
-
         if (attempts >= this.MAX_RETRIES) {
           throw new Error(
             `Failed to generate proposal after ${this.MAX_RETRIES} attempts. Last error: ${

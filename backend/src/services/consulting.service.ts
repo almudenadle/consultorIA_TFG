@@ -227,7 +227,12 @@ export class ConsultingService {
         (a) => a.status !== StatusArea.COMPLETED,
       );
       const limitQuestionsReached = numQuestionsAns >= this.MAX_NUM_QUESTIONS;
-      const generateProposal = !hasPendingAreas || limitQuestionsReached;
+      let generateProposal = !hasPendingAreas || limitQuestionsReached;
+
+      // If the assistant returned no further questions, force the proposal phase
+      if ((questionsToSend?.length ?? 0) === 0) {
+        generateProposal = true;
+      }
 
       let responseToForm = await FormParser.parseAgentResponseToForm(
         {
