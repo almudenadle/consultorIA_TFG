@@ -316,6 +316,7 @@ export class DynamicFormContainerComponent implements OnInit {
    * Creates a new consultation
    */
   private createNewConsultation(): void {
+    console.log('🛑 [DEBUG FRONTEND] Creating new consultation');
     const userID = this.authService.getNumUserIdFromToken();
 
     if (!userID) {
