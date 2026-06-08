@@ -39,7 +39,7 @@ export class EmailService {
 
       // Send email with PDF attachment
       const info = await transporter.sendMail({
-        from: `Informe de Consultoría <${process.env.EMAIL_USER}>`,
+        from: 'Informe de Consultoría <onboarding@resend.dev>',
         to: emailInfo.clientEmail,
         subject: "Informe de Consultoría - Tu reporte está listo",
         text: "Adjunto encontrarás el informe de consultoría solicitado.",
