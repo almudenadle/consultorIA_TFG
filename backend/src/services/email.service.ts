@@ -32,6 +32,10 @@ export class EmailService {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PSSWD,
         },
+        tls: {
+    rejectUnauthorized: false 
+  },
+  connectionTimeout: 10000 // Fail quickly instead of hanging
       });
 
       // Send email with PDF attachment

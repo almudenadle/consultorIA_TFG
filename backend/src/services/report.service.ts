@@ -1034,7 +1034,7 @@ public static async generateAndSaveAreaProposals(
   ): void {
     // Add company logo
     try {
-      const logoPath = path.join(__dirname, '../assets/tedconsulting logo.png');
+      const logoPath = path.join(__dirname, '../assets/ugr.png');
       const logoBuffer = fs.readFileSync(logoPath);
       const logoBase64 = logoBuffer.toString('base64');
       const logoDataUrl = `data:image/png;base64,${logoBase64}`;
