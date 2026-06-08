@@ -419,49 +419,18 @@ onSubmit(): void {
           // 🔴 LOG 1: VER EXACTAMENTE QUÉ DEVUELVE EL BACKEND
           console.log('🛑 [DEBUG FRONTEND] Payload crudo recibido del backend:', nextForm);
 
+         // ...
           if (this.isFirstForm) {
             this.consultingID = parseInt(nextForm.consultingId, 10);
             this.formID = parseInt(nextForm.formId || nextForm.formID, 10);
             this.isFirstForm = false;
           }
 
-          if (this.questions && this.formGroup) {
-            const trimmedValues: Record<string, any> = {};
-            Object.keys(this.formGroup.value).forEach((key) => {
-              const value = this.formGroup!.value[key];
-              trimmedValues[key] = typeof value === 'string' ? value.trim() : value;
-            });
+          // EXTRAER EL ARRAY CORRECTAMENTE:
+          const arrayCampos = nextForm.questions || nextForm.fields || [];
 
-            this.submittedForms.update((forms) => [
-              ...forms,
-              {
-                fields: this.questions!,
-                values: trimmedValues,
-                areaName: this.currentAreaName,
-              },
-            ]);
-          }
-
-          if (this.consultingID && this.consultingID !== -1) {
-            const currentPath = this.location.path();
-            const expectedPath = `/consultations/${this.consultingID}`;
-            if (currentPath !== expectedPath) {
-              this.location.replaceState(expectedPath);
-            }
-          }
-
-          // 🔴 EXTRAEMOS LOS CAMPOS DE FORMA SEGURA (Por si se llama fields o questions)
-          const arrayCampos = nextForm.fields || nextForm.questions || [];
-          
-          // 🔴 LOG 2: VERIFICAR LA CONDICIÓN DEL REPORTE
-          console.log('🛑 [DEBUG FRONTEND] Evaluación del reporte:', {
-            shouldGenerateProposal: nextForm.shouldGenerateProposal,
-            cantidadDeCampos: arrayCampos.length
-          });
-
-          // Check if should generate proposal (CÓDIGO ORIGINAL BLINDADO)
+          // EVALUAR CONDICIÓN DE REPORTE:
           if (nextForm.shouldGenerateProposal === true && arrayCampos.length === 0) {
-            console.log('🛑 [DEBUG FRONTEND] ¡Condición cumplida! Activando la fase de reporte...');
             
             if (nextForm.allAreas || nextForm.currentArea || nextForm.assistantMessage) {
               this.consultationDataUpdated.emit({
@@ -475,15 +444,17 @@ onSubmit(): void {
             this.isGeneratingProposal.set(true);
             this.questions = [];
             this.formGroup = undefined;
+            
+            this.cdr.detectChanges(); // Forzar actualización visual del spinner
+            
             this.generateProposal();
             return;
           }
 
-          console.log('🛑 [DEBUG FRONTEND] No se activó el reporte. Cargando el siguiente formulario.');
-
-          // Update with next form data
+          // SI NO ES FASE DE REPORTE: Continúa normal
           this.formID = parseInt(nextForm.formId || nextForm.formID, 10);
           this.questions = arrayCampos;
+// ...
           this.isFirstForm = false;
           this.currentAreaName = nextForm.currentArea?.name || 'Sin área asignada';
 
