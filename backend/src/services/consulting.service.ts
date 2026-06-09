@@ -27,7 +27,7 @@ import { StatusArea } from "../models/enums/kpi_status.enum";
  * Handles consulting creation, prompt generation, structured response parsing, and KPI updates.
  */
 export class ConsultingService {
-  private static readonly MAX_NUM_QUESTIONS = 4;
+  private static readonly MAX_NUM_QUESTIONS = 9;
   private static readonly MAX_NUM_QUESTIONS_PER_FORM = 2;
   private static readonly MIN_SCORE = 8;
   private static readonly AREA_FINISHED = "FINISHED";
@@ -220,8 +220,6 @@ export class ConsultingService {
         newMeanVelocity = result.meanVelocity;
         assistantMessage = validated.assistantMessage;
       }
-      //Console log para debuggear el contenido de las preguntas a enviar al frontend
-      console.log(questionsToSend);
 
       const hasPendingAreas = updatedAreas.some(
         (a) => a.status !== StatusArea.COMPLETED,
@@ -233,16 +231,6 @@ export class ConsultingService {
       if ((questionsToSend?.length ?? 0) === 0) {
         generateProposal = true;
       }
-
-      console.log("[REPORT TRIGGER CHECK]", {
-        consultingId: data.consultingID,
-        numQuestionsAns,
-        maxQuestions: this.MAX_NUM_QUESTIONS,
-        limitQuestionsReached,
-        hasPendingAreas,
-        questionsReturned: questionsToSend.length,
-        generateProposal,
-      });
 
       let responseToForm = await FormParser.parseAgentResponseToForm(
         {
@@ -280,9 +268,7 @@ export class ConsultingService {
       }));
 
       if (generateProposal) {
-        console.log(
-          `[REPORT TRIGGER] Activating proposal phase for consulting ${data.consultingID} after ${numQuestionsAns} questions`,
-        );
+
         responseToForm.questions = [];
         responseToForm.shouldGenerateProposal = true;
       }
@@ -290,8 +276,6 @@ export class ConsultingService {
       responseToForm.currentArea = mappedCurrentArea;
       responseToForm.allAreas = mappedAllAreas;
       responseToForm.meanVelocity = newMeanVelocity;
-
-      console.log("🛑 [DEBUG BACKEND] Payload a enviar al Frontend:", JSON.stringify(responseToForm, null, 2));
 
       return responseToForm;
     } catch (error) {

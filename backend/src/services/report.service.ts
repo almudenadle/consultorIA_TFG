@@ -56,10 +56,7 @@ public static async generateReport(
     userId: number,
   ): Promise<IReportToSend> {
     try {
-      console.log("[REPORT GENERATION] Starting report generation", {
-        consultingId,
-        userId,
-      });
+
 
       // Fetch consulting with all related data
       const consulting = await this.consultingRepo.findOne({
@@ -81,21 +78,10 @@ public static async generateReport(
         throw new Error("Report already exists for this consulting session");
       }
 
-      console.log("[REPORT GENERATION] Consulting snapshot", {
-        consultingId: consulting.id,
-        areas: consulting.areas?.length ?? 0,
-        forms: consulting.forms?.length ?? 0,
-        existingReport: Boolean(consulting.report),
-      });
 
       // Build comprehensive context for the AI from the database summaries
       const contextPrompt = this.buildReportContext(consulting);
 
-      console.log("[REPORT GENERATION] Prompt prepared", {
-        consultingId,
-        promptLength: contextPrompt.length,
-        areaCount: consulting.areas?.length ?? 0,
-      });
 
       // Request proposal from Groq Chat Completions with retries
       const proposalResponse = await this.requestProposalFromAI(contextPrompt);
@@ -112,10 +98,6 @@ public static async generateReport(
 
       const savedReport = await this.reportRepo.save(report);
 
-      console.log("[REPORT GENERATION] Report persisted", {
-        consultingId,
-        reportId: savedReport.id,
-      });
 
       // Persist each key recommendation as an independent record
       const savedRecommendations: IKeyRecommendation[] = [];
@@ -136,11 +118,6 @@ public static async generateReport(
         });
       }
 
-      console.log("[REPORT GENERATION] Key recommendations persisted", {
-        consultingId,
-        reportId: savedReport.id,
-        count: savedRecommendations.length,
-      });
 
       // Update consulting status to FINISHED
       await this.consultingRepo.update(
@@ -324,8 +301,6 @@ public static async generateAndSaveAreaProposals(
   let attempts = 0;
   const startTime = Date.now();
 
-  console.log("[DEBUG REPORTE] Iniciando solicitud de reporte en Groq.");
-
   while (attempts < this.MAX_RETRIES) {
     try {
       const attemptStart = Date.now();
@@ -337,9 +312,7 @@ public static async generateAndSaveAreaProposals(
         response_format: proposalResponseFormat,
       });
 
-      console.log(`[DEBUG REPORTE] Tiempo de respuesta de Groq (Intento ${attempts + 1}): ${(Date.now() - attemptStart) / 1000}s`);
-      console.log("[DEBUG REPORTE] Motivo de finalización de Groq:", completion.choices[0]?.finish_reason);
-
+   
       const rawContent = completion.choices[0]?.message?.content;
       if (!rawContent) throw new Error("No text response from Groq");
 
@@ -362,7 +335,6 @@ public static async generateAndSaveAreaProposals(
       // Validar con Zod
       try {
         const validatedResponse = ProposalSchema.parse(jsonResponse);
-        console.log(`[DEBUG REPORTE] Reporte generado con éxito en ${(Date.now() - startTime) / 1000}s totales.`);
         return validatedResponse;
       } catch (zodErr: any) {
         console.error("[DEBUG REPORTE] Error de validación en el Schema de Zod (ProposalSchema):", zodErr.errors || zodErr);
