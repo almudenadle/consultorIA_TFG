@@ -28,6 +28,7 @@
     "openai": "6.17.0",
     "pg": "8.21.0",
     "reflect-metadata": "0.2.2",
+    "resend": "6.12.4",
     "typeorm": "0.3.28",
     "zod": "4.3.6"
   },

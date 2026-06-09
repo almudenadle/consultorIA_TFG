@@ -1,45 +1,26 @@
-import nodemailer from "nodemailer";
+import { Resend } from 'resend';
 
-/**
- * Interface for email configuration data
- */
+// Inicializamos Resend. 
+// Asumo que en tu .env sigues teniendo tu API Key (la que empieza por re_) en la variable EMAIL_PSSWD
+const resend = new Resend(process.env.EMAIL_PSSWD);
+
 interface EmailFileInfo {
   clientEmail: string;
   fileName: string;
   pdfData: string;
 }
 
-/**
- * Service for sending emails with PDF attachments.
- * Uses nodemailer to send consulting reports via email.
- */
 export class EmailService {
-  /**
-   * Sends an email with a PDF report attached.
-   * Uses SMTP configuration from environment variables.
-   *
-   * @param emailInfo - Contains recipient email, filename, and PDF data in Base64
-   * @returns Promise that resolves when email is sent successfully
-   * @throws {Error} If email sending fails or SMTP configuration is invalid
-   */
   public static async sendEmail(emailInfo: EmailFileInfo): Promise<void> {
     try {
-      const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST, // "smtp.gmail.com"
-        port: parseInt(process.env.EMAIL_PORT || "465"),
-        secure: true, // true para 465
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PSSWD,
-        }
-      });
-
-      // En el from, pones tu email de Gmail
-      const info = await transporter.sendMail({
-        from: `Informe de Consultoría <${process.env.EMAIL_USER}>`,
-        to: emailInfo.clientEmail,
+      console.log("Iniciando envío de correo por API HTTP (Saltando bloqueo de Render)...");
+      
+      const { data, error } = await resend.emails.send({
+        // OBLIGATORIO MIENTRAS ESTÉS EN PRUEBAS:
+        from: 'Informe de Consultoría <onboarding@resend.dev>', 
+        // OBLIGATORIO MIENTRAS ESTÉS EN PRUEBAS: Tu propio correo registrado en Resend
+        to: emailInfo.clientEmail, 
         subject: "Informe de Consultoría - Tu reporte está listo",
-        text: "Adjunto encontrarás el informe de consultoría solicitado.",
         html: `
           <div style="font-family: Arial, sans-serif; padding: 20px;">
             <h2>Informe de Consultoría</h2>
@@ -54,16 +35,20 @@ export class EmailService {
         attachments: [
           {
             filename: emailInfo.fileName,
-            content: emailInfo.pdfData,
-            contentType: "application/pdf",
-            encoding: "base64",
+            content: emailInfo.pdfData, 
+            // Resend detecta automáticamente que es un base64, no hace falta especificar 'encoding'
           },
         ],
       });
 
-      console.log("Email sent successfully:", info.messageId);
+      if (error) {
+        console.error("Resend devolvió un error:", error);
+        throw new Error(error.message);
+      }
+
+      console.log("¡Email enviado exitosamente! ID:", data?.id);
     } catch (error) {
-      console.error("Error sending email:", error);
+      console.error("Error crítico enviando email:", error);
       throw new Error(
         `Failed to send email: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
