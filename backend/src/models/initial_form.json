@@ -74,8 +74,8 @@
         },
         {
           "type": "maxLength",
-          "value": 30,
-          "message": "La descripción no puede superar los 30 caracteres"
+          "value": 50,
+          "message": "La descripción no puede superar los 50 caracteres"
         }
       ]
     }

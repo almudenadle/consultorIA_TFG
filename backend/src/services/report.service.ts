@@ -620,9 +620,10 @@ export class ReportService {
           if (currentY > maxY) {
             pdf.addPage();
             this.addPageHeader(pdf, pageWidth, colors);
-            currentY = 27; // Ajustado para compensar el spacing de los section headers
+            currentY = 27;
           }
-          pdf.text(line, margin, currentY);
+          // Use maxWidth + justify so each line fills the full column width
+          pdf.text(line, margin, currentY, { maxWidth: contentWidth, align: "justify" });
           currentY += 6;
         }
 
@@ -782,7 +783,10 @@ export class ReportService {
           const boxWidth = contentWidth + 4;
 
           // 1. Ampliamos el margen interno de seguridad
-          const textAreaWidth = boxWidth - 12;
+          // textAreaWidth must respect that text starts at margin+4 and box ends at boxMargin+boxWidth
+          // boxMargin = margin-2, boxWidth = contentWidth+4  → right edge = margin-2+contentWidth+4 = margin+contentWidth+2
+          // text starts at margin+4, so available width = (margin+contentWidth+2) - (margin+4) - 8 (right inner padding)
+          const textAreaWidth = contentWidth - 10;
 
           // 2. CORRECCIÓN CRÍTICA: Establecer la fuente ANTES de medir el texto
           pdf.setFont("helvetica", "normal");
@@ -846,8 +850,7 @@ export class ReportService {
             pdf.setFontSize(10);
             pdf.setTextColor(60, 60, 60);
 
-            // 3. RENDERIZADO JUSTIFICADO DIRECTO
-            // Al pasar el texto completo y definir maxWidth, jsPDF ajusta y justifica automáticamente
+            // RENDERIZADO JUSTIFICADO: text starts at margin+4, maxWidth must not exceed right boundary
             pdf.text(area.summary, margin + 4, boxY, {
               maxWidth: textAreaWidth,
               align: "justify"
@@ -875,7 +878,7 @@ export class ReportService {
             pdf.setFontSize(10);
             pdf.setTextColor(60, 60, 60);
 
-            // 3. RENDERIZADO JUSTIFICADO DIRECTO
+            // RENDERIZADO JUSTIFICADO: text starts at margin+4, maxWidth must not exceed right boundary
             pdf.text(area.proposal, margin + 4, boxY, {
               maxWidth: textAreaWidth,
               align: "justify"
