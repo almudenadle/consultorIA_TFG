@@ -25,19 +25,18 @@ export class EmailService {
   public static async sendEmail(emailInfo: EmailFileInfo): Promise<void> {
     try {
       const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST || "smtp.ethereal.email",
-        port: parseInt(process.env.EMAIL_PORT || "587"),
-        secure: true,
+        host: process.env.EMAIL_HOST, // "smtp.gmail.com"
+        port: parseInt(process.env.EMAIL_PORT || "465"),
+        secure: true, // true para 465
         auth: {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PSSWD,
-        },
-
+        }
       });
 
-      // Send email with PDF attachment
+      // En el from, pones tu email de Gmail
       const info = await transporter.sendMail({
-        from: 'Informe de Consultoría <onboarding@resend.dev>',
+        from: `Informe de Consultoría <${process.env.EMAIL_USER}>`,
         to: emailInfo.clientEmail,
         subject: "Informe de Consultoría - Tu reporte está listo",
         text: "Adjunto encontrarás el informe de consultoría solicitado.",
