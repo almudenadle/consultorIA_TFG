@@ -51,7 +51,7 @@ export class ReportService {
   private static readonly MAX_RETRIES = 3;
   private static readonly RETRY_DELAY_MS = 2000;
 
-public static async generateReport(
+  public static async generateReport(
     consultingId: number,
     userId: number,
   ): Promise<IReportToSend> {
@@ -181,7 +181,7 @@ public static async generateReport(
    *
    * @param consulting - The consulting entity with areas loaded
    */
-public static async generateAndSaveAreaProposals(
+  public static async generateAndSaveAreaProposals(
     consulting: Consulting,
   ): Promise<void> {
     if (!consulting.areas || consulting.areas.length === 0) {
@@ -294,66 +294,66 @@ public static async generateAndSaveAreaProposals(
    * @returns Validated proposal response from the AI
    * @throws {Error} If maximum retries exceeded or validation fails
    */
- private static async requestProposalFromAI(
-  contextPrompt: string,
-): Promise<ProposalResponse> {
-  const groq = GroqClient.getInstance();
-  let attempts = 0;
-  const startTime = Date.now();
+  private static async requestProposalFromAI(
+    contextPrompt: string,
+  ): Promise<ProposalResponse> {
+    const groq = GroqClient.getInstance();
+    let attempts = 0;
+    const startTime = Date.now();
 
-  while (attempts < this.MAX_RETRIES) {
-    try {
-      const attemptStart = Date.now();
-      
-      const completion = await groq.chat.completions.create({
-        model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
-        max_completion_tokens: Number(process.env.GROQ_MAX_COMPLETION_TOKENS) || 4096,
-        messages: [{ role: "user", content: contextPrompt }],
-        response_format: proposalResponseFormat,
-      });
-
-   
-      const rawContent = completion.choices[0]?.message?.content;
-      if (!rawContent) throw new Error("No text response from Groq");
-
-      const cleanContent = rawContent
-        .replace(/^```json\s*/i, "")
-        .replace(/^```\s*/i, "")
-        .replace(/\s*```$/, "")
-        .trim();
-
-      // Verificar si el JSON se parsea correctamente antes de enviarlo a Zod
-      let jsonResponse;
+    while (attempts < this.MAX_RETRIES) {
       try {
-        jsonResponse = JSON.parse(cleanContent);
-      } catch (jsonErr: any) {
-        console.error("[DEBUG REPORTE] El JSON de Groq vino defectuoso o incompleto (posible truncamiento de tokens).");
-        console.error("[DEBUG REPORTE] Contenido recibido truncado:", cleanContent.substring(cleanContent.length - 200));
-        throw jsonErr;
-      }
+        const attemptStart = Date.now();
 
-      // Validar con Zod
-      try {
-        const validatedResponse = ProposalSchema.parse(jsonResponse);
-        return validatedResponse;
-      } catch (zodErr: any) {
-        console.error("[DEBUG REPORTE] Error de validación en el Schema de Zod (ProposalSchema):", zodErr.errors || zodErr);
-        throw zodErr;
-      }
+        const completion = await groq.chat.completions.create({
+          model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
+          max_completion_tokens: Number(process.env.GROQ_MAX_COMPLETION_TOKENS) || 4096,
+          messages: [{ role: "user", content: contextPrompt }],
+          response_format: proposalResponseFormat,
+        });
 
-    } catch (error: any) {
-      attempts++;
-      console.error(`[DEBUG REPORTE] Intento ${attempts} fallido. Error general:`, error.message);
 
-      if (attempts >= this.MAX_RETRIES) {
-        throw new Error(`Failed to generate proposal after ${this.MAX_RETRIES} attempts.`);
+        const rawContent = completion.choices[0]?.message?.content;
+        if (!rawContent) throw new Error("No text response from Groq");
+
+        const cleanContent = rawContent
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/\s*```$/, "")
+          .trim();
+
+        // Verificar si el JSON se parsea correctamente antes de enviarlo a Zod
+        let jsonResponse;
+        try {
+          jsonResponse = JSON.parse(cleanContent);
+        } catch (jsonErr: any) {
+          console.error("[DEBUG REPORTE] El JSON de Groq vino defectuoso o incompleto (posible truncamiento de tokens).");
+          console.error("[DEBUG REPORTE] Contenido recibido truncado:", cleanContent.substring(cleanContent.length - 200));
+          throw jsonErr;
+        }
+
+        // Validar con Zod
+        try {
+          const validatedResponse = ProposalSchema.parse(jsonResponse);
+          return validatedResponse;
+        } catch (zodErr: any) {
+          console.error("[DEBUG REPORTE] Error de validación en el Schema de Zod (ProposalSchema):", zodErr.errors || zodErr);
+          throw zodErr;
+        }
+
+      } catch (error: any) {
+        attempts++;
+        console.error(`[DEBUG REPORTE] Intento ${attempts} fallido. Error general:`, error.message);
+
+        if (attempts >= this.MAX_RETRIES) {
+          throw new Error(`Failed to generate proposal after ${this.MAX_RETRIES} attempts.`);
+        }
+        await this.sleep(this.RETRY_DELAY_MS);
       }
-      await this.sleep(this.RETRY_DELAY_MS);
     }
-  }
 
-  throw new Error("Unexpected error in proposal generation");
-}
+    throw new Error("Unexpected error in proposal generation");
+  }
 
   /**
    * Utility function to pause execution for a specified duration.
@@ -527,464 +527,478 @@ public static async generateAndSaveAreaProposals(
       // Helper to create RGB color tuples
       const rgb = (r: number, g: number, b: number): [number, number, number] => [r, g, b];
 
-    // Color palette
-    const colors = {
-      primary: rgb(41, 128, 185),      // Professional blue
-      secondary: rgb(52, 73, 94),      // Dark blue-gray
-      accent: rgb(46, 204, 113),       // Green accent
-      lightGray: rgb(236, 240, 241),   // Light gray background
-      darkGray: rgb(127, 140, 141),    // Medium gray
-      white: rgb(255, 255, 255),       // White
-      warning: rgb(241, 196, 15),      // Yellow/gold
-    };
+      // Color palette
+      const colors = {
+        primary: rgb(41, 128, 185),      // Professional blue
+        secondary: rgb(52, 73, 94),      // Dark blue-gray
+        accent: rgb(46, 204, 113),       // Green accent
+        lightGray: rgb(236, 240, 241),   // Light gray background
+        darkGray: rgb(127, 140, 141),    // Medium gray
+        white: rgb(255, 255, 255),       // White
+        warning: rgb(241, 196, 15),      // Yellow/gold
+      };
 
-    // Helper function to check if we need a new page
-    const checkPageBreak = (currentY: number, requiredSpace: number): number => {
-      // If we have less than 35mm available, or if adding this content would exceed the page,
-      // start fresh on a new page to avoid awkward splits
-      const availableSpace = pageHeight - margin - currentY;
-      
-      if (availableSpace < 35 || currentY + requiredSpace > pageHeight - margin) {
-        pdf.addPage();
-        this.addPageHeader(pdf, pageWidth, colors);
-        return 27; // Ajustado para compensar el spacing de los section headers
-      }
-      return currentY;
-    };
+      // Helper function to check if we need a new page
+      const checkPageBreak = (currentY: number, requiredSpace: number): number => {
+        // If we have less than 35mm available, or if adding this content would exceed the page,
+        // start fresh on a new page to avoid awkward splits
+        const availableSpace = pageHeight - margin - currentY;
 
-    // Helper function to draw section header with background
-    const drawSectionHeader = (title: string, yPos: number): number => {
-      // Add spacing before the header to avoid overlap
-      const adjustedY = yPos + 8;
-      
-      // Draw colored background rectangle
-      pdf.setFillColor(...colors.primary);
-      pdf.rect(margin - 5, adjustedY - 7, contentWidth + 10, 11, "F");
-      
-      // Draw section title
-      pdf.setTextColor(...colors.white);
-      pdf.setFontSize(13);
-      pdf.setFont("helvetica", "bold");
-      pdf.text(title, margin, adjustedY);
-      
-      // Reset text color
-      pdf.setTextColor(0, 0, 0);
-      
-      return adjustedY + 12;
-    };
-
-    // Helper function to draw info box
-    const drawInfoBox = (content: string[], yPos: number, bgColor: [number, number, number] = colors.lightGray): number => {
-      const boxPadding = 10;
-      const lineHeight = 7;
-      const boxHeight = content.length * lineHeight + boxPadding;
-      
-      // Draw background box
-      pdf.setFillColor(...bgColor);
-      pdf.roundedRect(margin, yPos, contentWidth, boxHeight, 2, 2, "F");
-      
-      // Draw border
-      pdf.setDrawColor(...colors.primary);
-      pdf.setLineWidth(0.5);
-      pdf.roundedRect(margin, yPos, contentWidth, boxHeight, 2, 2, "S");
-      
-      // Draw content
-      pdf.setTextColor(...colors.secondary);
-      pdf.setFontSize(10);
-      pdf.setFont("helvetica", "normal");
-      
-      let currentY = yPos + boxPadding / 2 + 5;
-      content.forEach(line => {
-        pdf.text(line, margin + 5, currentY);
-        currentY += lineHeight;
-      });
-      
-      // Reset
-      pdf.setTextColor(0, 0, 0);
-      pdf.setDrawColor(0, 0, 0);
-      pdf.setLineWidth(0.2);
-      
-      return yPos + boxHeight + 5;
-    };
-
-    // Helper function to add styled paragraph
-    const addStyledParagraph = (text: string, yPos: number, maxY: number): number => {
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(10);
-      pdf.setTextColor(60, 60, 60);
-      
-      const lines = pdf.splitTextToSize(text, contentWidth);
-      let currentY = yPos;
-      
-      for (const line of lines) {
-        if (currentY > maxY) {
+        if (availableSpace < 35 || currentY + requiredSpace > pageHeight - margin) {
           pdf.addPage();
           this.addPageHeader(pdf, pageWidth, colors);
-          currentY = 27; // Ajustado para compensar el spacing de los section headers
+          return 27; // Ajustado para compensar el spacing de los section headers
         }
-        pdf.text(line, margin, currentY);
-        currentY += 6;
-      }
-      
-      pdf.setTextColor(0, 0, 0);
-      return currentY + 3;
-    };
+        return currentY;
+      };
 
-    // ============ COVER PAGE ============
-    this.buildCoverPage(pdf, consulting, colors, pageWidth, pageHeight);
-    
-    // ============ CONTENT PAGES ============
-    pdf.addPage();
-    this.addPageHeader(pdf, pageWidth, colors);
-    let yPosition = 27; // Ajustado para compensar el spacing de los section headers
+      // Helper function to draw section header with background
+      const drawSectionHeader = (title: string, yPos: number): number => {
+        // Add spacing before the header to avoid overlap
+        const adjustedY = yPos + 8;
 
-    // Conclusion Section (Executive Summary) - Página dedicada
-    if (consulting.report?.conclusion) {
-      yPosition = drawSectionHeader("Conclusión Ejecutiva", yPosition);
-      yPosition = addStyledParagraph(consulting.report.conclusion, yPosition, pageHeight - margin);
-    }
+        // Draw colored background rectangle
+        pdf.setFillColor(...colors.primary);
+        pdf.rect(margin - 5, adjustedY - 7, contentWidth + 10, 11, "F");
 
-    // Summary Section - Nueva página
-    pdf.addPage();
-    this.addPageHeader(pdf, pageWidth, colors);
-    yPosition = 27;
-    
-    yPosition = drawSectionHeader("Resumen del Problema Planteado", yPosition);
-    if (consulting.report?.summary) {
-      yPosition = addStyledParagraph(consulting.report.summary, yPosition, pageHeight - margin);
-    }
-
-    // Proposal Section - Misma página que el resumen
-    yPosition = checkPageBreak(yPosition, 30);
-    
-    yPosition = drawSectionHeader("Recomendaciones y Propuesta", yPosition);
-    if (consulting.report?.proposal) {
-      yPosition = addStyledParagraph(consulting.report.proposal, yPosition, pageHeight - margin);
-    }
-
-    // Key Recommendations Section - Nueva página
-    const keyRecs = consulting.report?.keyRecommendations;
-    if (keyRecs && keyRecs.length > 0) {
-      // Nueva página para las recomendaciones clave
-      pdf.addPage();
-      this.addPageHeader(pdf, pageWidth, colors);
-      yPosition = 27;
-
-      yPosition = drawSectionHeader("Recomendaciones Clave", yPosition);
-
-      keyRecs.forEach((rec, index) => {
-        // Check if there's enough space for title + 2 lines of description
-        yPosition = checkPageBreak(yPosition, 25);
-
-        // Title sin box, como subsección con numeración
-        pdf.setTextColor(...colors.secondary);
-        pdf.setFontSize(12);
+        // Draw section title
+        pdf.setTextColor(...colors.white);
+        pdf.setFontSize(13);
         pdf.setFont("helvetica", "bold");
-        const numberedTitle = `${index + 1}. ${rec.title}`;
-        const titleLines = pdf.splitTextToSize(numberedTitle, contentWidth - 10);
-        let titleY = yPosition;
-        titleLines.forEach((line: string) => {
-          if (titleY > pageHeight - margin) {
-            pdf.addPage();
-            this.addPageHeader(pdf, pageWidth, colors);
-            titleY = 35;
-          }
-          pdf.text(line, margin, titleY);
-          titleY += 6;
-        });
-        yPosition = titleY + 4;
+        pdf.text(title, margin, adjustedY);
 
-        // Description
+        // Reset text color
+        pdf.setTextColor(0, 0, 0);
+
+        return adjustedY + 12;
+      };
+
+      // Helper function to draw info box
+      const drawInfoBox = (content: string[], yPos: number, bgColor: [number, number, number] = colors.lightGray): number => {
+        const boxPadding = 10;
+        const lineHeight = 7;
+        const boxHeight = content.length * lineHeight + boxPadding;
+
+        // Draw background box
+        pdf.setFillColor(...bgColor);
+        pdf.roundedRect(margin, yPos, contentWidth, boxHeight, 2, 2, "F");
+
+        // Draw border
+        pdf.setDrawColor(...colors.primary);
+        pdf.setLineWidth(0.5);
+        pdf.roundedRect(margin, yPos, contentWidth, boxHeight, 2, 2, "S");
+
+        // Draw content
+        pdf.setTextColor(...colors.secondary);
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "normal");
+
+        let currentY = yPos + boxPadding / 2 + 5;
+        content.forEach(line => {
+          pdf.text(line, margin + 5, currentY);
+          currentY += lineHeight;
+        });
+
+        // Reset
+        pdf.setTextColor(0, 0, 0);
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setLineWidth(0.2);
+
+        return yPos + boxHeight + 5;
+      };
+
+      // Helper function to add styled paragraph
+      const addStyledParagraph = (text: string, yPos: number, maxY: number): number => {
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(10);
         pdf.setTextColor(60, 60, 60);
-        const descLines = pdf.splitTextToSize(rec.description, contentWidth - 10);
-        descLines.forEach((line: string) => {
-          if (yPosition > pageHeight - margin) {
+
+        const lines = pdf.splitTextToSize(text, contentWidth);
+        let currentY = yPos;
+
+        for (const line of lines) {
+          if (currentY > maxY) {
             pdf.addPage();
             this.addPageHeader(pdf, pageWidth, colors);
-            yPosition = 35;
+            currentY = 27; // Ajustado para compensar el spacing de los section headers
           }
-          pdf.text(line, margin, yPosition);
-          yPosition += 5.5;
-        });
-
-        // Labels/Tags
-        if (rec.labels && rec.labels.length > 0) {
-          // Colores para las tags
-          const tagColors = [
-            { bg: rgb(240, 248, 255), text: rgb(41, 128, 185), border: rgb(41, 128, 185) },      // Azul
-            { bg: rgb(240, 255, 240), text: rgb(46, 204, 113), border: rgb(46, 204, 113) },      // Verde
-            { bg: rgb(255, 250, 240), text: rgb(241, 196, 15), border: rgb(241, 196, 15) },      // Amarillo
-            { bg: rgb(255, 240, 245), text: rgb(231, 76, 60), border: rgb(231, 76, 60) },        // Rojo
-            { bg: rgb(245, 240, 255), text: rgb(155, 89, 182), border: rgb(155, 89, 182) },      // Morado
-            { bg: rgb(240, 255, 255), text: rgb(26, 188, 156), border: rgb(26, 188, 156) },      // Turquesa
-          ];
-          
-          yPosition += 4;
-          let xPos = margin;
-          rec.labels.forEach((label: string, labelIndex: number) => {
-            const tagColor = tagColors[labelIndex % tagColors.length];
-            const trimmedLabel = label.trim();
-            pdf.setFillColor(...tagColor.bg);
-            pdf.setDrawColor(...tagColor.border);
-            pdf.setLineWidth(0.5);
-            pdf.setFont("helvetica", "bold");
-            pdf.setFontSize(8);
-            const labelWidth = pdf.getTextWidth(trimmedLabel) + 6;
-            pdf.roundedRect(xPos, yPosition - 3, labelWidth, 5, 1, 1, "FD");
-            pdf.setTextColor(...tagColor.text);
-            pdf.text(trimmedLabel, xPos + 3, yPosition);
-            xPos += labelWidth + 3;
-            if (xPos > pageWidth - margin - 20) {
-              xPos = margin;
-              yPosition += 7;
-            }
-          });
-          pdf.setLineWidth(0.2);
-          pdf.setFont("helvetica", "normal");
-          yPosition += 6;
+          pdf.text(line, margin, currentY);
+          currentY += 6;
         }
-        
-        yPosition += 6;
-        pdf.setTextColor(0, 0, 0);
-      });
-    }
 
-    // Area-specific Proposals Section
-    const areas = consulting.areas ?? [];
-    if (areas.length > 0) {
-      // Nueva página para las propuestas específicas por área
+        pdf.setTextColor(0, 0, 0);
+        return currentY + 3;
+      };
+
+      // ============ COVER PAGE ============
+      this.buildCoverPage(pdf, consulting, colors, pageWidth, pageHeight);
+
+      // ============ CONTENT PAGES ============
+      pdf.addPage();
+      this.addPageHeader(pdf, pageWidth, colors);
+      let yPosition = 27; // Ajustado para compensar el spacing de los section headers
+
+      // Conclusion Section (Executive Summary) - Página dedicada
+      if (consulting.report?.conclusion) {
+        yPosition = drawSectionHeader("Conclusión Ejecutiva", yPosition);
+        yPosition = addStyledParagraph(consulting.report.conclusion, yPosition, pageHeight - margin);
+      }
+
+      // Summary Section - Nueva página
       pdf.addPage();
       this.addPageHeader(pdf, pageWidth, colors);
       yPosition = 27;
 
-      yPosition = drawSectionHeader("Propuestas Específicas por Área", yPosition);
+      yPosition = drawSectionHeader("Resumen del Problema Planteado", yPosition);
+      if (consulting.report?.summary) {
+        yPosition = addStyledParagraph(consulting.report.summary, yPosition, pageHeight - margin);
+      }
 
-      // Array de colores para diferentes áreas
-      const areaColors = [
-        { bg: rgb(240, 248, 255), border: rgb(41, 128, 185), badge: rgb(41, 128, 185) },    // Azul
-        { bg: rgb(240, 255, 240), border: rgb(46, 204, 113), badge: rgb(46, 204, 113) },    // Verde
-        { bg: rgb(255, 250, 240), border: rgb(241, 196, 15), badge: rgb(241, 196, 15) },    // Amarillo
-        { bg: rgb(255, 240, 245), border: rgb(231, 76, 60), badge: rgb(231, 76, 60) },      // Rojo
-        { bg: rgb(245, 240, 255), border: rgb(155, 89, 182), badge: rgb(155, 89, 182) },    // Morado
-        { bg: rgb(240, 255, 255), border: rgb(26, 188, 156), badge: rgb(26, 188, 156) },    // Turquesa
-      ];
+      // Proposal Section - Misma página que el resumen
+      yPosition = checkPageBreak(yPosition, 30);
 
-      areas.forEach((area, index) => {
-        // Check if there's enough space for area box (minimum 40mm)
-        yPosition = checkPageBreak(yPosition, 40);
+      yPosition = drawSectionHeader("Recomendaciones y Propuesta", yPosition);
+      if (consulting.report?.proposal) {
+        yPosition = addStyledParagraph(consulting.report.proposal, yPosition, pageHeight - margin);
+      }
 
-        const areaColor = areaColors[index % areaColors.length];
-        const boxStartY = yPosition;
-        const boxPadding = 8;
-        const boxMargin = margin - 2;
-        const boxWidth = contentWidth + 4;
-        
-        // Pre-calcular las líneas del contenido
-        let summaryLines: string[] = [];
-        if (area.summary) {
-          summaryLines = pdf.splitTextToSize(area.summary, boxWidth - 8);
-        }
-        
-        let proposalLines: string[] = [];
-        if (area.proposal) {
-          proposalLines = pdf.splitTextToSize(area.proposal, boxWidth - 8);
-        }
-        
-        // Calcular altura exacta del contenido simulando el renderizado
-        let boxY = boxStartY + boxPadding;
-        boxY += 10; // Area name
-        
-        if (area.summary) {
-          boxY += summaryLines.length * 5.5;
-          if (area.proposal) {
-            boxY += 3; // Espacio entre summary y proposal
-          }
-        }
-        
-        if (area.proposal) {
-          boxY += 10; // Label "Propuesta Comercial"
-          boxY += proposalLines.length * 5.5;
-        }
-        
-        // Calcular altura total del box con padding final
-        const contentHeight = boxY - boxStartY + boxPadding;
-        
-        // Dibujar el box de fondo con color específico del área
-        pdf.setFillColor(...areaColor.bg);
-        pdf.roundedRect(boxMargin, boxStartY, boxWidth, contentHeight, 3, 3, "F");
-        
-        // Dibujar borde del box
-        pdf.setDrawColor(...areaColor.border);
-        pdf.setLineWidth(1);
-        pdf.roundedRect(boxMargin, boxStartY, boxWidth, contentHeight, 3, 3, "S");
-        
-        // Resetear line width
-        pdf.setLineWidth(0.2);
-        
-        // Ahora renderizar el contenido real
-        boxY = boxStartY + boxPadding;
+      // Key Recommendations Section - Nueva página
+      const keyRecs = consulting.report?.keyRecommendations;
+      if (keyRecs && keyRecs.length > 0) {
+        // Nueva página para las recomendaciones clave
+        pdf.addPage();
+        this.addPageHeader(pdf, pageWidth, colors);
+        yPosition = 27;
 
-        // Area name sin badge (sin numeración)
-        pdf.setTextColor(...colors.secondary);
-        pdf.setFontSize(14);
-        pdf.setFont("helvetica", "bold");
-        pdf.text(area.name, margin + 4, boxY + 2);
-        boxY += 10;
+        yPosition = drawSectionHeader("Recomendaciones Clave", yPosition);
 
-        // Area summary (sin título)
-        if (area.summary) {
+        keyRecs.forEach((rec, index) => {
+          // Check if there's enough space for title + 2 lines of description
+          yPosition = checkPageBreak(yPosition, 25);
+
+          // Title sin box, como subsección con numeración
+          pdf.setTextColor(...colors.secondary);
+          pdf.setFontSize(12);
+          pdf.setFont("helvetica", "bold");
+          const numberedTitle = `${index + 1}. ${rec.title}`;
+          const titleLines = pdf.splitTextToSize(numberedTitle, contentWidth - 10);
+          let titleY = yPosition;
+          titleLines.forEach((line: string) => {
+            if (titleY > pageHeight - margin) {
+              pdf.addPage();
+              this.addPageHeader(pdf, pageWidth, colors);
+              titleY = 35;
+            }
+            pdf.text(line, margin, titleY);
+            titleY += 6;
+          });
+          yPosition = titleY + 4;
+
+          // Description
           pdf.setFont("helvetica", "normal");
           pdf.setFontSize(10);
           pdf.setTextColor(60, 60, 60);
-          summaryLines.forEach((line: string) => {
-            pdf.text(line, margin + 4, boxY);
-            boxY += 5.5;
+          const descLines = pdf.splitTextToSize(rec.description, contentWidth - 10);
+          descLines.forEach((line: string) => {
+            if (yPosition > pageHeight - margin) {
+              pdf.addPage();
+              this.addPageHeader(pdf, pageWidth, colors);
+              yPosition = 35;
+            }
+            pdf.text(line, margin, yPosition);
+            yPosition += 5.5;
           });
-          if (area.proposal) {
-            boxY += 3; // Espacio entre summary y proposal
-          }
-        }
 
-        // Area proposal (Propuesta Comercial)
-        if (area.proposal) {
-          // Draw subsection label with semi-transparent background
-          pdf.setFillColor(255, 255, 255, 0.7);
-          pdf.roundedRect(margin + 2, boxY - 1, boxWidth - 12, 7, 1, 1, "F");
-          pdf.setFontSize(9);
-          pdf.setFont("helvetica", "bold");
+          // Labels/Tags
+          if (rec.labels && rec.labels.length > 0) {
+            // Colores para las tags
+            const tagColors = [
+              { bg: rgb(240, 248, 255), text: rgb(41, 128, 185), border: rgb(41, 128, 185) },      // Azul
+              { bg: rgb(240, 255, 240), text: rgb(46, 204, 113), border: rgb(46, 204, 113) },      // Verde
+              { bg: rgb(255, 250, 240), text: rgb(241, 196, 15), border: rgb(241, 196, 15) },      // Amarillo
+              { bg: rgb(255, 240, 245), text: rgb(231, 76, 60), border: rgb(231, 76, 60) },        // Rojo
+              { bg: rgb(245, 240, 255), text: rgb(155, 89, 182), border: rgb(155, 89, 182) },      // Morado
+              { bg: rgb(240, 255, 255), text: rgb(26, 188, 156), border: rgb(26, 188, 156) },      // Turquesa
+            ];
+
+            yPosition += 4;
+            let xPos = margin;
+            rec.labels.forEach((label: string, labelIndex: number) => {
+              const tagColor = tagColors[labelIndex % tagColors.length];
+              const trimmedLabel = label.trim();
+              pdf.setFillColor(...tagColor.bg);
+              pdf.setDrawColor(...tagColor.border);
+              pdf.setLineWidth(0.5);
+              pdf.setFont("helvetica", "bold");
+              pdf.setFontSize(8);
+              const labelWidth = pdf.getTextWidth(trimmedLabel) + 6;
+              pdf.roundedRect(xPos, yPosition - 3, labelWidth, 5, 1, 1, "FD");
+              pdf.setTextColor(...tagColor.text);
+              pdf.text(trimmedLabel, xPos + 3, yPosition);
+              xPos += labelWidth + 3;
+              if (xPos > pageWidth - margin - 20) {
+                xPos = margin;
+                yPosition += 7;
+              }
+            });
+            pdf.setLineWidth(0.2);
+            pdf.setFont("helvetica", "normal");
+            yPosition += 6;
+          }
+
+          yPosition += 6;
+          pdf.setTextColor(0, 0, 0);
+        });
+      }
+
+      // Area-specific Proposals Section
+      const areas = consulting.areas ?? [];
+      if (areas.length > 0) {
+        // Nueva página para las propuestas específicas por área
+        pdf.addPage();
+        this.addPageHeader(pdf, pageWidth, colors);
+        yPosition = 27;
+
+        yPosition = drawSectionHeader("Propuestas Específicas por Área", yPosition);
+
+        // Array de colores para diferentes áreas
+        const areaColors = [
+          { bg: rgb(240, 248, 255), border: rgb(41, 128, 185), badge: rgb(41, 128, 185) },    // Azul
+          { bg: rgb(240, 255, 240), border: rgb(46, 204, 113), badge: rgb(46, 204, 113) },    // Verde
+          { bg: rgb(255, 250, 240), border: rgb(241, 196, 15), badge: rgb(241, 196, 15) },    // Amarillo
+          { bg: rgb(255, 240, 245), border: rgb(231, 76, 60), badge: rgb(231, 76, 60) },      // Rojo
+          { bg: rgb(245, 240, 255), border: rgb(155, 89, 182), badge: rgb(155, 89, 182) },    // Morado
+          { bg: rgb(240, 255, 255), border: rgb(26, 188, 156), badge: rgb(26, 188, 156) },    // Turquesa
+        ];
+
+        areas.forEach((area, index) => {
+          // Check if there's enough space for area box (minimum 40mm)
+          yPosition = checkPageBreak(yPosition, 40);
+
+          const areaColor = areaColors[index % areaColors.length];
+          const boxStartY = yPosition;
+          const boxPadding = 8;
+          const boxMargin = margin - 2;
+          const boxWidth = contentWidth + 4;
+
+          // 1. Ampliamos el margen interno de seguridad
+          const textAreaWidth = boxWidth - 12;
+
+          // 2. CORRECCIÓN CRÍTICA: Establecer la fuente ANTES de medir el texto
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(10);
+
+          // Pre-calcular las líneas del contenido (ahora el cálculo no se desbordará)
+          let summaryLines: string[] = [];
+          if (area.summary) {
+            summaryLines = pdf.splitTextToSize(area.summary, textAreaWidth);
+          }
+
+          let proposalLines: string[] = [];
+          if (area.proposal) {
+            proposalLines = pdf.splitTextToSize(area.proposal, textAreaWidth);
+          }
+
+          // Calcular altura exacta del contenido simulando el renderizado
+          let boxY = boxStartY + boxPadding;
+          boxY += 10; // Area name
+
+          if (area.summary) {
+            boxY += summaryLines.length * 5.5;
+            if (area.proposal) {
+              boxY += 3; // Espacio entre summary y proposal
+            }
+          }
+
+          if (area.proposal) {
+            boxY += 10; // Label "Propuesta Comercial"
+            boxY += proposalLines.length * 5.5;
+          }
+
+          // Calcular altura total del box con padding final
+          const contentHeight = boxY - boxStartY + boxPadding;
+
+          // Dibujar el box de fondo con color específico del área
+          pdf.setFillColor(...areaColor.bg);
+          pdf.roundedRect(boxMargin, boxStartY, boxWidth, contentHeight, 3, 3, "F");
+
+          // Dibujar borde del box
           pdf.setDrawColor(...areaColor.border);
-          pdf.setTextColor(...areaColor.border);
-          pdf.text("Propuesta Comercial", margin + 4, boxY + 3);
+          pdf.setLineWidth(1);
+          pdf.roundedRect(boxMargin, boxStartY, boxWidth, contentHeight, 3, 3, "S");
+
+          // Resetear line width
+          pdf.setLineWidth(0.2);
+
+          // Ahora renderizar el contenido real
+          boxY = boxStartY + boxPadding;
+
+          // Area name sin badge
+          pdf.setTextColor(...colors.secondary);
+          pdf.setFontSize(14);
+          pdf.setFont("helvetica", "bold");
+          pdf.text(area.name, margin + 4, boxY + 2);
           boxY += 10;
 
-          pdf.setFont("helvetica", "normal");
-          pdf.setFontSize(10);
-          pdf.setTextColor(60, 60, 60);
-          proposalLines.forEach((line: string) => {
-            pdf.text(line, margin + 4, boxY);
-            boxY += 5.5;
+          // Area summary 
+          if (area.summary) {
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(10);
+            pdf.setTextColor(60, 60, 60);
+
+            // 3. RENDERIZADO JUSTIFICADO DIRECTO
+            // Al pasar el texto completo y definir maxWidth, jsPDF ajusta y justifica automáticamente
+            pdf.text(area.summary, margin + 4, boxY, {
+              maxWidth: textAreaWidth,
+              align: "justify"
+            });
+
+            boxY += summaryLines.length * 5.5;
+            if (area.proposal) {
+              boxY += 3;
+            }
+          }
+
+          // Area proposal (Propuesta Comercial)
+          if (area.proposal) {
+            // Label visual "Propuesta Comercial"
+            pdf.setFillColor(255, 255, 255, 0.7);
+            pdf.roundedRect(margin + 2, boxY - 1, boxWidth - 12, 7, 1, 1, "F");
+            pdf.setFontSize(9);
+            pdf.setFont("helvetica", "bold");
+            pdf.setDrawColor(...areaColor.border);
+            pdf.setTextColor(...areaColor.border);
+            pdf.text("Propuesta Comercial", margin + 4, boxY + 3);
+            boxY += 10;
+
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(10);
+            pdf.setTextColor(60, 60, 60);
+
+            // 3. RENDERIZADO JUSTIFICADO DIRECTO
+            pdf.text(area.proposal, margin + 4, boxY, {
+              maxWidth: textAreaWidth,
+              align: "justify"
+            });
+          }
+
+          // Actualizar yPosition después del box
+          yPosition = boxStartY + contentHeight + 10;
+          pdf.setTextColor(0, 0, 0);
+          pdf.setDrawColor(0, 0, 0);
+        });
+      }
+
+      // Estimated Impact Section - Diseño en tres bloques
+      if (consulting.report!.estimatedImpact) {
+        // Check space for header + three blocks (estimate ~50mm total)
+        yPosition = checkPageBreak(yPosition, 50);
+
+        yPosition = drawSectionHeader("Impacto Estimado", yPosition);
+
+        const impact = consulting.report!.estimatedImpact;
+        const blockWidth = (contentWidth - 10) / 3; // Dividir en 3 con espacios
+        const blockHeight = 35;
+        const startY = yPosition;
+
+        // Helper para formatear texto: mayúsculas, sin guiones bajos
+        const formatImpactText = (text: string): string => {
+          return text.replace(/_/g, ' ').toUpperCase();
+        };
+
+        // Bloque izquierda - Plazo
+        if (impact.timeframe) {
+          const leftX = margin;
+          pdf.setFillColor(240, 248, 255); // Azul suave
+          pdf.roundedRect(leftX, startY, blockWidth, blockHeight, 3, 3, "F");
+          pdf.setDrawColor(...colors.primary);
+          pdf.setLineWidth(0.5);
+          pdf.roundedRect(leftX, startY, blockWidth, blockHeight, 3, 3, "S");
+
+          // Etiqueta
+          pdf.setTextColor(...colors.primary);
+          pdf.setFontSize(9);
+          pdf.setFont("helvetica", "bold");
+          pdf.text("PLAZO", leftX + blockWidth / 2, startY + 10, { align: "center" });
+
+          // Valor formateado
+          pdf.setTextColor(...colors.secondary);
+          pdf.setFontSize(12);
+          pdf.setFont("helvetica", "bold");
+          const formattedTimeframe = formatImpactText(impact.timeframe.replace(/_plazo|plazo/gi, '').trim());
+          const timeframeLines = pdf.splitTextToSize(formattedTimeframe, blockWidth - 8);
+          let timeY = startY + 20;
+          timeframeLines.forEach((line: string) => {
+            pdf.text(line, leftX + blockWidth / 2, timeY, { align: "center" });
+            timeY += 6;
           });
         }
-        
-        // Actualizar yPosition después del box
-        yPosition = boxStartY + contentHeight + 10;
+
+        // Bloque centro - Complejidad
+        if (impact.complexity) {
+          const centerX = margin + blockWidth + 5;
+          pdf.setFillColor(255, 250, 240); // Amarillo suave
+          pdf.roundedRect(centerX, startY, blockWidth, blockHeight, 3, 3, "F");
+          pdf.setDrawColor(...colors.warning);
+          pdf.setLineWidth(0.5);
+          pdf.roundedRect(centerX, startY, blockWidth, blockHeight, 3, 3, "S");
+
+          // Etiqueta
+          pdf.setTextColor(...colors.warning);
+          pdf.setFontSize(9);
+          pdf.setFont("helvetica", "bold");
+          pdf.text("COMPLEJIDAD", centerX + blockWidth / 2, startY + 10, { align: "center" });
+
+          // Valor formateado
+          pdf.setTextColor(...colors.secondary);
+          pdf.setFontSize(12);
+          pdf.setFont("helvetica", "bold");
+          const formattedComplexity = formatImpactText(impact.complexity);
+          const complexityLines = pdf.splitTextToSize(formattedComplexity, blockWidth - 8);
+          let complexY = startY + 20;
+          complexityLines.forEach((line: string) => {
+            pdf.text(line, centerX + blockWidth / 2, complexY, { align: "center" });
+            complexY += 6;
+          });
+        }
+
+        // Bloque derecha - Nivel de Inversión
+        if (impact.investmentLevel) {
+          const rightX = margin + (blockWidth + 5) * 2;
+          pdf.setFillColor(240, 255, 240); // Verde suave
+          pdf.roundedRect(rightX, startY, blockWidth, blockHeight, 3, 3, "F");
+          pdf.setDrawColor(...colors.accent);
+          pdf.setLineWidth(0.5);
+          pdf.roundedRect(rightX, startY, blockWidth, blockHeight, 3, 3, "S");
+
+          // Etiqueta
+          pdf.setTextColor(...colors.accent);
+          pdf.setFontSize(9);
+          pdf.setFont("helvetica", "bold");
+          pdf.text("INVERSIÓN", rightX + blockWidth / 2, startY + 10, { align: "center" });
+
+          // Valor formateado
+          pdf.setTextColor(...colors.secondary);
+          pdf.setFontSize(12);
+          pdf.setFont("helvetica", "bold");
+          const formattedInvestment = formatImpactText(impact.investmentLevel);
+          const investmentLines = pdf.splitTextToSize(formattedInvestment, blockWidth - 8);
+          let investY = startY + 20;
+          investmentLines.forEach((line: string) => {
+            pdf.text(line, rightX + blockWidth / 2, investY, { align: "center" });
+            investY += 6;
+          });
+        }
+
+        yPosition = startY + blockHeight + 8;
         pdf.setTextColor(0, 0, 0);
-        pdf.setDrawColor(0, 0, 0);
-      });
-    }
-
-    // Estimated Impact Section - Diseño en tres bloques
-    if (consulting.report!.estimatedImpact) {
-      // Check space for header + three blocks (estimate ~50mm total)
-      yPosition = checkPageBreak(yPosition, 50);
-
-      yPosition = drawSectionHeader("Impacto Estimado", yPosition);
-
-      const impact = consulting.report!.estimatedImpact;
-      const blockWidth = (contentWidth - 10) / 3; // Dividir en 3 con espacios
-      const blockHeight = 35;
-      const startY = yPosition;
-      
-      // Helper para formatear texto: mayúsculas, sin guiones bajos
-      const formatImpactText = (text: string): string => {
-        return text.replace(/_/g, ' ').toUpperCase();
-      };
-      
-      // Bloque izquierda - Plazo
-      if (impact.timeframe) {
-        const leftX = margin;
-        pdf.setFillColor(240, 248, 255); // Azul suave
-        pdf.roundedRect(leftX, startY, blockWidth, blockHeight, 3, 3, "F");
-        pdf.setDrawColor(...colors.primary);
-        pdf.setLineWidth(0.5);
-        pdf.roundedRect(leftX, startY, blockWidth, blockHeight, 3, 3, "S");
-        
-        // Etiqueta
-        pdf.setTextColor(...colors.primary);
-        pdf.setFontSize(9);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("PLAZO", leftX + blockWidth / 2, startY + 10, { align: "center" });
-        
-        // Valor formateado
-        pdf.setTextColor(...colors.secondary);
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "bold");
-        const formattedTimeframe = formatImpactText(impact.timeframe.replace(/_plazo|plazo/gi, '').trim());
-        const timeframeLines = pdf.splitTextToSize(formattedTimeframe, blockWidth - 8);
-        let timeY = startY + 20;
-        timeframeLines.forEach((line: string) => {
-          pdf.text(line, leftX + blockWidth / 2, timeY, { align: "center" });
-          timeY += 6;
-        });
       }
-      
-      // Bloque centro - Complejidad
-      if (impact.complexity) {
-        const centerX = margin + blockWidth + 5;
-        pdf.setFillColor(255, 250, 240); // Amarillo suave
-        pdf.roundedRect(centerX, startY, blockWidth, blockHeight, 3, 3, "F");
-        pdf.setDrawColor(...colors.warning);
-        pdf.setLineWidth(0.5);
-        pdf.roundedRect(centerX, startY, blockWidth, blockHeight, 3, 3, "S");
-        
-        // Etiqueta
-        pdf.setTextColor(...colors.warning);
-        pdf.setFontSize(9);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("COMPLEJIDAD", centerX + blockWidth / 2, startY + 10, { align: "center" });
-        
-        // Valor formateado
-        pdf.setTextColor(...colors.secondary);
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "bold");
-        const formattedComplexity = formatImpactText(impact.complexity);
-        const complexityLines = pdf.splitTextToSize(formattedComplexity, blockWidth - 8);
-        let complexY = startY + 20;
-        complexityLines.forEach((line: string) => {
-          pdf.text(line, centerX + blockWidth / 2, complexY, { align: "center" });
-          complexY += 6;
-        });
-      }
-      
-      // Bloque derecha - Nivel de Inversión
-      if (impact.investmentLevel) {
-        const rightX = margin + (blockWidth + 5) * 2;
-        pdf.setFillColor(240, 255, 240); // Verde suave
-        pdf.roundedRect(rightX, startY, blockWidth, blockHeight, 3, 3, "F");
-        pdf.setDrawColor(...colors.accent);
-        pdf.setLineWidth(0.5);
-        pdf.roundedRect(rightX, startY, blockWidth, blockHeight, 3, 3, "S");
-        
-        // Etiqueta
-        pdf.setTextColor(...colors.accent);
-        pdf.setFontSize(9);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("INVERSIÓN", rightX + blockWidth / 2, startY + 10, { align: "center" });
-        
-        // Valor formateado
-        pdf.setTextColor(...colors.secondary);
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "bold");
-        const formattedInvestment = formatImpactText(impact.investmentLevel);
-        const investmentLines = pdf.splitTextToSize(formattedInvestment, blockWidth - 8);
-        let investY = startY + 20;
-        investmentLines.forEach((line: string) => {
-          pdf.text(line, rightX + blockWidth / 2, investY, { align: "center" });
-          investY += 6;
-        });
-      }
-      
-      yPosition = startY + blockHeight + 8;
-      pdf.setTextColor(0, 0, 0);
-    }
 
-    // Add footers to all pages
-    this.addPageFooters(pdf, pageWidth, pageHeight, margin, colors);
+      // Add footers to all pages
+      this.addPageFooters(pdf, pageWidth, pageHeight, margin, colors);
 
-    return pdf;
-    
+      return pdf;
+
     } catch (error) {
       console.error('[PDF Generation] Error building PDF document:', error);
       if (error instanceof Error) {
@@ -1010,13 +1024,13 @@ public static async generateAndSaveAreaProposals(
       const logoBuffer = fs.readFileSync(logoPath);
       const logoBase64 = logoBuffer.toString('base64');
       const logoDataUrl = `data:image/png;base64,${logoBase64}`;
-      
+
       // Add logo at the top center (40mm wide, maintaining aspect ratio)
       const logoWidth = 70;
       const logoHeight = 20; // Ajusta según el aspect ratio de tu logo
       const logoX = (pageWidth - logoWidth) / 2;
       const logoY = 15;
-      
+
       pdf.addImage(logoDataUrl, 'PNG', logoX, logoY, logoWidth, logoHeight);
     } catch (error) {
       console.warn('[PDF Generation] Could not load logo:', error);
@@ -1061,48 +1075,48 @@ public static async generateAndSaveAreaProposals(
       pdf.setDrawColor(...colors.primary);
       pdf.setLineWidth(0.5);
       pdf.roundedRect(20, 138, pageWidth - 40, 80, 3, 3, "S");
-      
+
       // Título principal
       pdf.setTextColor(...colors.darkGray);
       pdf.setFontSize(10);
       pdf.setFont("helvetica", "bold");
       pdf.text("DATOS DE EMPRESA", pageWidth / 2, 150, { align: "center" });
-      
+
       let dataY = 163;
-      
+
       // Nombre - etiqueta arriba del valor
       pdf.setTextColor(...colors.primary);
       pdf.setFontSize(8);
       pdf.setFont("helvetica", "bold");
       pdf.text("NOMBRE", pageWidth / 2, dataY, { align: "center" });
-      
+
       pdf.setTextColor(...colors.secondary);
       pdf.setFontSize(14);
       pdf.setFont("helvetica", "bold");
       pdf.text(consulting.user.company.name, pageWidth / 2, dataY + 6, { align: "center" });
-      
+
       dataY += 21;
-      
+
       // Sector - etiqueta arriba del valor
       pdf.setTextColor(...colors.primary);
       pdf.setFontSize(8);
       pdf.setFont("helvetica", "bold");
       pdf.text("SECTOR", pageWidth / 2, dataY, { align: "center" });
-      
+
       pdf.setTextColor(...colors.secondary);
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "bold");
       const sectorText = consulting.user.company.sector.toUpperCase();
       pdf.text(sectorText, pageWidth / 2, dataY + 6, { align: "center" });
-      
+
       dataY += 21;
-      
+
       // Tamaño - etiqueta arriba del valor
       pdf.setTextColor(...colors.primary);
       pdf.setFontSize(8);
       pdf.setFont("helvetica", "bold");
       pdf.text("TAMAÑO", pageWidth / 2, dataY, { align: "center" });
-      
+
       pdf.setTextColor(...colors.secondary);
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "bold");
@@ -1116,12 +1130,12 @@ public static async generateAndSaveAreaProposals(
     // Columna izquierda - Cliente (con más margen interno)
     const clientBoxLeftMargin = 35;
     const clientBoxRightMargin = 65;
-    
+
     pdf.setTextColor(...colors.darkGray);
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
     pdf.text("PREPARADO PARA", clientBoxLeftMargin, pageHeight - 55);
-    
+
     pdf.setTextColor(...colors.secondary);
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "bold");
@@ -1159,7 +1173,7 @@ public static async generateAndSaveAreaProposals(
   private static addPageHeader(pdf: jsPDF, pageWidth: number, colors: ColorPalette): void {
     pdf.setFillColor(...colors.primary);
     pdf.rect(0, 0, pageWidth, 18, "F");
-    
+
     pdf.setTextColor(...colors.white);
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
@@ -1177,10 +1191,10 @@ public static async generateAndSaveAreaProposals(
     colors: ColorPalette,
   ): void {
     const totalPages = pdf.getNumberOfPages();
-    
+
     for (let i = 1; i <= totalPages; i++) {
       pdf.setPage(i);
-      
+
       // Skip footer on cover page  
       if (i === 1) continue;
 
@@ -1188,7 +1202,7 @@ public static async generateAndSaveAreaProposals(
       pdf.setDrawColor(...colors.lightGray);
       pdf.setLineWidth(0.5);
       pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
-      
+
       // Page number
       pdf.setFontSize(9);
       pdf.setFont("helvetica", "normal");
@@ -1199,7 +1213,7 @@ public static async generateAndSaveAreaProposals(
         pageHeight - 10,
         { align: "center" }
       );
-      
+
       // Generation date
       pdf.text(
         `Generado el ${new Date().toLocaleDateString("es-ES")}`,
