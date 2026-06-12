@@ -20,9 +20,6 @@ export class Consulting {
   @Column({ nullable: true })
   title!: string;
 
-  @Column({ nullable: true })
-  threadID!: string;
-
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   date!: Date;
 

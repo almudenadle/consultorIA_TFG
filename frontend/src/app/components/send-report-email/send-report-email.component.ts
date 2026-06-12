@@ -88,7 +88,6 @@ export class SendReportEmailComponent {
 
       this.closeDialog();
 
-      // Show success message
       this.messageService.add({
         severity: 'success',
         summary: 'Enviado',

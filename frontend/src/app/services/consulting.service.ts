@@ -9,7 +9,7 @@ import {
   IFormFromBackend,
   IFormToBackend,
 } from '../interface/form_field.interface';
-import { enviroment } from '../../enviroment/enviroment';
+import { environment } from '../../environments/environment';
 import { ConsultingSummary } from '../interface/consulting_sumary.interface';
 import { IConsultingProposal } from '../interface/consulting.proposal.interface';
 import { ErrorService } from './error.service';
@@ -20,7 +20,7 @@ import { ErrorService } from './error.service';
  */
 @Injectable({ providedIn: 'root' })
 export class ConsultingService {
-  private apiUrl = `${enviroment.apiUrl}/consulting`;
+  private apiUrl = `${environment.apiUrl}/consulting`;
 
   constructor(
     private http: HttpClient,

@@ -209,7 +209,6 @@ export class RegistrationFormComponent {
     this.registrationService.registerUser(registrationData).subscribe({
       next: (response) => {
         this.loading = false;
-        // Puedes mostrar un mensaje de éxito global aquí si lo deseas
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
@@ -234,7 +233,6 @@ export class RegistrationFormComponent {
   resetForm(): void {
     this.registrationForm.reset();
     this.companyForm.reset();
-    // Mensajes locales eliminados
     this.router.navigate(['/']);
   }
 

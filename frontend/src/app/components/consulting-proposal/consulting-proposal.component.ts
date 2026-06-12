@@ -50,9 +50,7 @@ export class ConsultingProposalComponent implements AfterViewInit {
 
   // State signals
   isGenerating = signal<boolean>(false);
-  /** Active accordion panels — bound to p-accordion [(value)] in multiple mode */
   accordionValue = signal<number[]>([]);
-  // errorMessage eliminado, ahora se usa ErrorService
 
   // Injected services
   private reportService = inject(ReportService);

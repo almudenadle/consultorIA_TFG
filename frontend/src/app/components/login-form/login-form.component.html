@@ -24,7 +24,7 @@
                     class="w-full" 
                     [ngClass]="{'ng-invalid ng-dirty': loginForm.get('userId')?.invalid && loginForm.get('userId')?.touched}"
                 />
-                <label for="userId">Usuario / Correo</label>
+                <label for="userId">Usuario</label>
             </p-floatLabel>
             <small *ngIf="loginForm.get('userId')?.invalid && loginForm.get('userId')?.touched" class="error-text">
                 El usuario es requerido

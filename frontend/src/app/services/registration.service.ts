@@ -3,13 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, catchError, throwError } from 'rxjs';
 import { RegistrationRequest } from '../interface/user.interface';
 import { ErrorService } from './error.service';
-import { enviroment } from '../../enviroment/enviroment';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RegistrationService {
-  private apiUrl = `${enviroment.apiUrl}/user`;
+  private apiUrl = `${environment.apiUrl}/user`;
 
   constructor(
     private http: HttpClient,

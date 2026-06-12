@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { enviroment } from '../../enviroment/enviroment';
+import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 
 /**
@@ -20,7 +20,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = `${enviroment.apiUrl}/user`; // http://localhost:3000/api/user
+  private apiUrl = `${environment.apiUrl}/user`; // http://localhost:3000/api/user
 
   constructor(
     private http: HttpClient,
@@ -69,7 +69,6 @@ export class AuthService {
       const decodedPayload = JSON.parse(atob(payload));
 
       // Extract the user ID from the decoded payload
-      // Note: The property name may vary (id, userId, sub, etc.) depending on backend implementation
       const userId = decodedPayload.id;
 
       return userId;

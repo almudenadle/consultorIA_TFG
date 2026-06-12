@@ -289,7 +289,6 @@ export class ReportService {
    * Requests a proposal from the OpenAI Assistant with retry logic.
    * Validates the response using the ProposalSchema.
    *
-   * @param threadId - The existing thread ID from the consulting session
    * @param contextPrompt - The formatted context prompt
    * @returns Validated proposal response from the AI
    * @throws {Error} If maximum retries exceeded or validation fails
@@ -327,8 +326,6 @@ export class ReportService {
         try {
           jsonResponse = JSON.parse(cleanContent);
         } catch (jsonErr: any) {
-          console.error("[DEBUG REPORTE] El JSON de Groq vino defectuoso o incompleto (posible truncamiento de tokens).");
-          console.error("[DEBUG REPORTE] Contenido recibido truncado:", cleanContent.substring(cleanContent.length - 200));
           throw jsonErr;
         }
 
@@ -337,14 +334,11 @@ export class ReportService {
           const validatedResponse = ProposalSchema.parse(jsonResponse);
           return validatedResponse;
         } catch (zodErr: any) {
-          console.error("[DEBUG REPORTE] Error de validación en el Schema de Zod (ProposalSchema):", zodErr.errors || zodErr);
           throw zodErr;
         }
 
       } catch (error: any) {
         attempts++;
-        console.error(`[DEBUG REPORTE] Intento ${attempts} fallido. Error general:`, error.message);
-
         if (attempts >= this.MAX_RETRIES) {
           throw new Error(`Failed to generate proposal after ${this.MAX_RETRIES} attempts.`);
         }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { enviroment } from '../../enviroment/enviroment';
+import { environment } from '../../environments/environment';
 import {
   ProfileData,
   UserUpdateData,
@@ -26,7 +26,7 @@ import { ApiResponse } from '../interface/api-response.interface';
   providedIn: 'root',
 })
 export class ProfileConfigurationService {
-  private apiUrl = `${enviroment.apiUrl}/user`; // http://localhost:3000/api/user
+  private apiUrl = `${environment.apiUrl}/user`; // http://localhost:3000/api/user
 
   constructor(private http: HttpClient) {}
 

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { enviroment } from '../../enviroment/enviroment';
+import { environment } from '../../environments/environment';
 import { IConsultingProposal } from '../interface/consulting.proposal.interface';
 import { IPdfReportData } from '../interface/pdf_report.interface';
 import { response } from 'express';
@@ -10,7 +10,7 @@ import { ErrorService } from './error.service';
 
 @Injectable({ providedIn: 'root' })
 export class ReportService {
-  private apiUrl = `${enviroment.apiUrl}/report`;
+  private apiUrl = `${environment.apiUrl}/report`;
 
   constructor(
     private http: HttpClient,
